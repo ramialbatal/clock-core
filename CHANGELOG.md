@@ -1,9 +1,9 @@
 # Changelog
 
-Versions follow [semantic versioning](https://semver.org/): a clock pinned to `v1.x.y` keeps working with any later
+Versions follow [semantic versioning](https://semver.org/); tags are lowercase from v1.1.0 on (`v1.1.0`): a clock pinned to `v1.x.y` keeps working with any later
 `v1` release; breaking changes get a new major version.
 
-## v1.0.0 (2026-11)
+## v1.0.0 (2026-11), tagged `V1.0.0`, commit `7f64264`
 
 First release as a standalone package, moved out of the `shared/` folder of `ramialbatal.github.io`.
 

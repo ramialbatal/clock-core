@@ -13,7 +13,9 @@ No framework, no build step: one ES module and one stylesheet, loaded straight i
 
 ## Use it
 
-Pin a release (never `@main`), so a change here can't break a clock by surprise:
+Pin a release tag or an exact commit (never `@main`), so a change here can't break a clock by surprise. The first
+release was tagged `V1.0.0` (capital V), so the clocks pin its commit,
+`7f64264169149b91d119f75504cf419cf42475c2`; later releases use lowercase tags such as `v1.1.0`:
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@v1.0.0/clock-core.css">

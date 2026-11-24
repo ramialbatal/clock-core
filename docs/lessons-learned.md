@@ -108,6 +108,14 @@ numbers were wrong or a country was missing. Check this list before adding a dat
 - `YEAR` is read once at page load. A tab open across New Year kept counting the old year. The ticker now reloads the
   page when the year changes.
 
+## Releasing
+
+### Tag names are case-sensitive
+- The first clock-core release was created as `V1.0.0`, while the clocks asked jsDelivr for `v1.0.0`, which returned
+  404. Because GitHub Pages switched the addresses over as soon as Pages was turned on, two live clocks were briefly
+  broken. Fix: pin the exact commit. Lessons: check the CDN URL returns 200 **before** turning on Pages, and use
+  lowercase tags (`v1.1.0`).
+
 ## Tooling
 
 - **Test in a real browser through a local server** (`npm run serve`), not by opening the file: CORS, ES modules

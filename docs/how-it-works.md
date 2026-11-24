@@ -34,6 +34,9 @@ img/                  icon.svg, og-image.png (link preview, 1200×630)
 <script type="module" src="js/app.js"></script>
 ```
 
+The clocks currently pin clock-core v1.0.0 by its commit (`@7f64264…`), because that release was tagged `V1.0.0`
+with a capital V and jsDelivr treats tag names as case-sensitive. A tag or a commit both work; a commit never moves.
+
 The import map lets every module write `import * as C from "clock-core"`. In Node (tests, type checking) the same
 name resolves to the `clock-core` dev dependency, installed from the same release tag. To upgrade clock-core, change
 the version in both URLs and in `package.json`.
