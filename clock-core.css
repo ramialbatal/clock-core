@@ -391,7 +391,7 @@ html[data-i18n="pending"] body { visibility: hidden; }
 .lang-pick select { position: absolute; inset: 0; width: 100%; margin: 0; opacity: 0; cursor: pointer; font-size: 16px; }
 .lang-pick:hover { border-color: var(--accent-2); }
 .lang-pick:focus-within { border-color: var(--accent-2); outline: 2px solid var(--accent-2); outline-offset: 2px; }
-@media (max-width: 640px) { .lang-pick { position: static; align-self: flex-end; margin: 0 0 10px; height: 32px; } }
+@media (max-width: 640px) { .lang-pick { position: static; order: -2; align-self: flex-end; margin: 0 0 8px; height: 32px; } }
 /* Numbers keep their left-to-right order inside right-to-left text */
 [dir="rtl"] .big, [dir="rtl"] .ytd, [dir="rtl"] dd, [dir="rtl"] .goal-num, [dir="rtl"] .goal-side,
 [dir="rtl"] .history td, [dir="rtl"] pre, [dir="rtl"] .spark-wrap figcaption b { direction: ltr; unicode-bidi: isolate; }
