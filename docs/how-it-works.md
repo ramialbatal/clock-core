@@ -28,14 +28,15 @@ img/                  icon.svg, og-image.png (link preview, 1200×630)
 ## How a page loads
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@7f64264169149b91d119f75504cf419cf42475c2/clock-core.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@<pin>/clock-core.css">
 <link rel="stylesheet" href="css/theme.css">
-<script type="importmap">{ "imports": { "clock-core": "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@7f64264169149b91d119f75504cf419cf42475c2/clock-core.js" } }</script>
-<script type="module" src="js/app.js"></script>
+<script type="importmap">{ "imports": { "clock-core": "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@<pin>/clock-core.js" } }</script>
+<script type="module" src="js/app.js" onerror="clockLoadFailed()"></script>
 ```
 
-The clocks currently pin clock-core v1.0.0 by its commit (`@7f64264…`), because that release was tagged `V1.0.0`
-with a capital V and jsDelivr treats tag names as case-sensitive. A tag or a commit both work; a commit never moves.
+`<pin>` is an exact commit (what the clocks use; it never moves) or a lowercase release tag. Each clock's current pin
+is in its `index.html`; `CHANGELOG.md` lists the commit of every clock-core version. If the code can't load (CDN
+down, very old browser), a small inline script, `clockLoadFailed()`, shows the error box instead of the spinner.
 
 The import map lets every module write `import * as C from "clock-core"`. In Node (tests, type checking) the same
 name resolves to the `clock-core` dev dependency in `package.json`, pinned to the same commit. To upgrade clock-core,
@@ -73,6 +74,7 @@ See the table in the [clock-core README](../README.md#whats-inside). Highlights:
 |---|---|---|---|
 | Emissions | CO₂ by country | OWID grapher `annual-co2-emissions-per-country.csv` (filtered) | Global Carbon Project |
 | Emissions | Methane by country | OWID grapher `methane-emissions.csv` | Jones et al. |
+| Emissions | Per person (CO₂, methane) | OWID grapher `co-emissions-per-capita.csv`, `per-capita-methane-emissions.csv` | Same sources, for the "per person" figure |
 | Emissions | World total CO₂ incl. land use | OWID grapher `annual-co2-including-land-use.csv` | For the carbon budget bars |
 | Emissions | Remaining carbon budgets | typed into `js/config.js` | **Update every November** from the new Global Carbon Budget |
 | Renewables | Generation by source, all countries | OWID grapher `electricity-mix.csv?frequency=annual&metric=by_source&source=total&csvType=full` | Ember + Energy Institute. Full CSV on purpose (about 150 KB compressed). |
@@ -106,15 +108,20 @@ so far  = annual × fraction of the year elapsed (UTC)
 - IRENA values are end-of-year, so the 2025 value sits at 2026.0.
 - Capacity now = latest value grown at its latest yearly growth, shown in kW so it visibly ticks.
 - On-track path = compound growth from the 2022 value to 11,000 GW at the end of 2030; the bar marker shows it.
-- Verdict compares latest growth with the growth needed from the latest value to the target.
+- Verdict (`C.verdict`, values as displayed): On track if latest growth ≥ the growth needed from the latest value to
+  the target; Close if it is at least 85% of it; Off track if lower; Going backwards if negative. "Tripled" once the
+  multiple, as displayed, reaches 3.0.
 - Cards apply the same test to tripling each country's own 2022 capacity (a rough guide; the pledge is global).
 
 ### Levels between yearly averages (Jobs, `jobsEntry`)
 
 - Each ILO yearly average sits at mid-year; the level at any moment comes from `interpolateMidYear`.
 - Net new jobs so far = employed now - employed on 1 January. New workers = growth of (employed + unemployed).
-- Keeping-up ratio = net new jobs ÷ new workers over the calendar year. If the workforce shrinks, the ratio is
-  meaningless, so the verdict uses whether unemployment falls.
+- Keeping-up ratio = net new jobs ÷ new workers over the calendar year, shown as jobs per 100 new workers (never below
+  0). Keeping up at 100 or more, Close at 90 or more, otherwise Falling behind. If the workforce shrinks, the ratio is
+  meaningless, so the verdict is whether unemployment (in thousands, as displayed) falls.
+- UN goal check: "Improving" if the ILO's estimate of unemployed people for next year is lower than this year's (in
+  millions, as displayed), else "Getting worse".
 
 ## Displaying numbers
 
@@ -137,5 +144,6 @@ clock-core change before releasing it. The weekly scheduled run catches data sou
 ## Publishing
 
 - **A clock:** merge to `main`; GitHub Pages updates in a minute or two.
-- **clock-core:** merge to `main`, update the changelog, create a GitHub release with a new tag, then bump the version
-  in each clock (two URLs in `index.html`, one in `package.json`) through a pull request whose checks pass.
+- **clock-core:** see the release steps in its [README](../README.md#release): changelog and version in the pull
+  request, then each clock bumps its pin (two URLs in `index.html`, one in `package.json`) through a pull request whose
+  checks pass. A release tag is optional; the clocks pin the merge commit.

@@ -13,14 +13,13 @@ No framework, no build step: one ES module and one stylesheet, loaded straight i
 
 ## Use it
 
-Pin a release tag or an exact commit (never `@main`), so a change here can't break a clock by surprise. The first
-release was tagged `V1.0.0` (capital V), so the clocks pin its commit,
-`7f64264169149b91d119f75504cf419cf42475c2`; later releases use lowercase tags such as `v1.1.0`:
+Pin an exact commit or a release tag (never `@main`), so a change here can't break a clock by surprise. Each clock's
+current pin is in its `index.html`; `CHANGELOG.md` lists the commit of every version. Replace `<pin>` below:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@7f64264169149b91d119f75504cf419cf42475c2/clock-core.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@<pin>/clock-core.css">
 <script type="importmap">
-  { "imports": { "clock-core": "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@7f64264169149b91d119f75504cf419cf42475c2/clock-core.js" } }
+  { "imports": { "clock-core": "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@<pin>/clock-core.js" } }
 </script>
 <script type="module" src="js/app.js"></script>
 ```
@@ -43,8 +42,8 @@ The clock then sets its colours in its own `css/theme.css`: `--accent`, `--accen
 | Time (UTC) | `YEAR`, `yearStart`, `msPerYear`, `SEC_PER_YEAR`, `yearFraction`, `tYears` | `tYears` gives fractional years, e.g. 2026.89 |
 | Formats | `fmt[0..3]`, `shown`, `shownSign`, `signed`, `pct`, `digits`, `escapeHtml` | Compare and colour with `shown` (value as displayed); `signed` never shows "-0"; escape any data text put into HTML |
 | Data | `fetchText`, `fetchCsv`, `fetchJson`, `parseCsv`, `num`, `seriesByCode`, `namesByCode`, `once` | Strict parsing (bad cells are skipped, not misread); `once` caches a loader and retries after a failure |
-| Models | `project`, `interpolateMidYear`, `neededGrowth`, `verdict` | Pure functions, unit tested; `verdict` works for rising and falling goals |
-| Rendering | `sparkline`, `wireHistory`, `sortInto`, `showVerdict` | Sparkline colours follow which direction is good |
+| Models | `project`, `interpolateMidYear`, `neededGrowth`, `verdict`, `restOfWorld` | Pure functions, unit tested; `verdict` works for rising and falling goals ("Close" = at least 85% of the needed pace) |
+| Rendering | `sparkline`, `changeClass`, `trendText`, `wireHistory`, `sortInto`, `showVerdict` | Colours follow which direction is good, as displayed |
 | Ticker | `startTicker`, `stopTicker`, `setText` | About 10 redraws a second, writes only changed text, survives errors, reloads at New Year |
 | Page | `setState`, `wireHelp`, `fill`, `showVerdict` | Loading, ready and error states; the "?" pop-up; verdict badges |
 
@@ -64,7 +63,8 @@ for how the clocks are built, lessons learned and rules for new code.
 
 1. In the pull request: update `CHANGELOG.md` and `version` in `package.json`, run `npm run check`, and run each
    clock's smoke test against your checkout (`CLOCK_CORE_DIR=../clock-core npm run smoke` in the clock's folder).
-2. After merging, optionally create a GitHub release with a **lowercase** tag such as `v1.2.0`.
+2. After merging, add the merge commit to `CHANGELOG.md` and, optionally, create a GitHub release with a
+   **lowercase** tag such as `v1.2.0`. Clocks can pin either the commit or the tag.
 3. In each clock, change the pin (a commit SHA or the tag) in three places: the two URLs in `index.html` and the
    `clock-core` dev dependency in `package.json`. Check the new CDN URL returns 200 first:
    `curl -sI https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@<pin>/clock-core.js | head -1`.

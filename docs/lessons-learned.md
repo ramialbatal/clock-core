@@ -19,8 +19,8 @@ numbers were wrong or a country was missing. Check this list before adding a dat
 - **Why:** OWID's `csvType=filtered` drops every year that has any blank cell. Saudi Arabia has no hydro figure, so all
   its recent years disappeared. A `time=` filter made it worse.
 - **Now:** for multi-column data, download `csvType=full` (about 150 KB compressed here) and filter rows in the browser.
-  After loading, the code logs any configured country with no data (`console.warn("No data returned for: …")`). Keep
-  that check in new clocks.
+  After loading, each clock logs configured countries with no data, with a `console.warn` that starts "No" and ends
+  "data for:" (for example "No emissions data for: SAU"); the smoke test fails on it. Keep that check in new clocks.
 
 ### Multi-dimension charts ignore the country filter after a redirect
 - **What happened:** some redirected chart URLs returned every country even with `country=~CHN~USA`.
@@ -73,7 +73,7 @@ numbers were wrong or a country was missing. Check this list before adding a dat
 
 ### Colours that contradict the numbers
 - India showed "4.2% (4.2%)" in red, because the unrounded rates differed by 0.03. Compare values as displayed.
-- The "since you opened this page" counter showed "-0". `ClockCore.signed()` now drops the sign on a rounded zero.
+- The "since you opened this page" counter showed "-0". clock-core's `signed` now drops the sign on a rounded zero.
 
 ### Bars that measure nothing
 - A full-width bar under "unemployed now" looked meaningful but wasn't. Every bar must answer "how full, out of what?".

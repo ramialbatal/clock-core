@@ -294,6 +294,44 @@ export function verdict(actual, needed, nearBand = 0.85) {
   return { cls: "bad", text: "Off track" };
 }
 
+/**
+ * "Rest of world": world minus the listed top-level places (those not part of another listed entry).
+ * A place whose data ends before the world's latest year counts with its projected value for that year,
+ * so it isn't silently attributed to the rest of the world. The yearly rate is never below 0.
+ * @param {{ annual: number, lastValue: number, lastYear: number }} world
+ * @param {{ annual: number, at: (year: number) => number, partOf?: string }[]} entries
+ */
+export function restOfWorld(world, entries) {
+  const top = entries.filter((e) => !e.partOf);
+  return {
+    annual: Math.max(world.annual - top.reduce((s, e) => s + e.annual, 0), 0),
+    lastValue: world.lastValue - top.reduce((s, e) => s + e.at(world.lastYear), 0),
+    lastYear: world.lastYear
+  };
+}
+
+/**
+ * Colour class for a change, as displayed with `d` decimals: "good", "bad" or "" when it shows as zero.
+ * @param {number} x
+ * @param {number} d
+ * @param {"up" | "down"} good  which direction is good
+ * @returns {"good" | "bad" | ""}
+ */
+export function changeClass(x, d, good) {
+  const s = shownSign(x, d) * (good === "up" ? 1 : -1);
+  return s > 0 ? "good" : s < 0 ? "bad" : "";
+}
+
+/**
+ * Yearly trend as text: "▲ +1.2%", "▼ -0.8%", or "0.0%" when it shows as zero; "n/a" for null.
+ * @param {number | null} growth  0.012 = 1.2%
+ */
+export function trendText(growth) {
+  if (growth == null) return "n/a";
+  const s = shownSign(growth * 100, 1);
+  return (s > 0 ? "▲ " : s < 0 ? "▼ " : "") + signed(growth * 100, fmt[1]) + "%";
+}
+
 // ---- Rendering (returns HTML strings or touches given elements) ---------------------
 
 /**

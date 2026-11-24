@@ -3,7 +3,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   signed, pct, digits, escapeHtml, parseCsv, seriesByCode, namesByCode, num, shown, shownSign, project,
-  interpolateMidYear, neededGrowth, verdict, sparkline, tYears, yearFraction, YEAR, fmt, once
+  interpolateMidYear, neededGrowth, verdict, sparkline, tYears, yearFraction, YEAR, fmt, once,
+  restOfWorld, changeClass, trendText
 } from "../clock-core.js";
 
 const close = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) < eps, `${a} is not close to ${b}`);
@@ -155,4 +156,23 @@ test("once caches success and retries after failure", async () => {
   const flaky = once(async () => { if (fails++ === 0) throw new Error("x"); return "y"; });
   await assert.rejects(flaky());
   assert.equal(await flaky(), "y");
+});
+
+test("restOfWorld: listed places come off the world, parts (partOf) aren't counted twice, laggards use their projection", () => {
+  const r = restOfWorld({ annual: 100, lastValue: 90, lastYear: 2025 }, [
+    { annual: 30, at: () => 25 }, { annual: 20, at: () => 15, partOf: "EU" }, { annual: 12, at: (y) => (y === 2025 ? 11 : 10) }
+  ]);
+  assert.deepEqual(r, { annual: 58, lastValue: 54, lastYear: 2025 });
+  assert.equal(restOfWorld({ annual: 10, lastValue: 10, lastYear: 2025 }, [{ annual: 12, at: () => 9 }]).annual, 0);
+});
+
+test("changeClass and trendText follow the value as displayed", () => {
+  assert.equal(changeClass(0.04, 1, "up"), "");
+  assert.equal(changeClass(0.06, 1, "up"), "good");
+  assert.equal(changeClass(0.06, 1, "down"), "bad");
+  assert.equal(changeClass(-2, 0, "down"), "good");
+  assert.equal(trendText(0.012), "▲ +1.2%");
+  assert.equal(trendText(-0.008), "▼ -0.8%");
+  assert.equal(trendText(-0.0004), "0.0%");
+  assert.equal(trendText(null), "n/a");
 });

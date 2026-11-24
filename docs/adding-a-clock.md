@@ -25,8 +25,8 @@ the rule here first rather than quietly breaking it in one clock.
 
 1. Create an empty public repository named `<topic>-clock`.
 2. Copy the structure of the closest clock: `index.html`, `css/theme.css`, `js/config.js`, `js/model.js`, `js/app.js`,
-   `test/`, `scripts/` (unchanged), `.github/` (unchanged), `package.json`, `jsconfig.json`, `LICENSE`,
-   `CONTRIBUTING.md`, `CLAUDE.md`.
+   `test/`, `scripts/` (unchanged), `.github/` (unchanged), `package.json`, `jsconfig.json`, `.gitignore`, `LICENSE`,
+   `README.md`, `CONTRIBUTING.md`, `CLAUDE.md` and the `AGENTS.md` link to it (`ln -s CLAUDE.md AGENTS.md`).
 3. Set the five colour variables in `theme.css`, the `smoke` settings in `package.json` (which elements must tick,
    which verdicts must show), and the texts.
 4. Turn on GitHub Pages (Settings, Pages, "Deploy from a branch", `main`, `/ (root)`).
@@ -46,7 +46,9 @@ the rule here first rather than quietly breaking it in one clock.
 - `theme.css` holds only the colour variables and styles truly specific to that clock.
 - `config.js` holds everything someone might want to change without reading the code. Hand-entered figures get a
   comment with their source and when to update them.
-- Use the same country list as the other clocks unless there's a reason not to, so pages can be compared.
+- Use the same country list as the other clocks unless there's a reason not to, so pages can be compared. A country
+  entry needs `code` and `flag` (and `name` where the source has no display names, as in the Jobs Clock); also update
+  the country list in `llms.txt`.
 
 ## 4. Reading data well
 
@@ -71,7 +73,10 @@ the rule here first rather than quietly breaking it in one clock.
 - One `C.startTicker()` per page; inside it, update with `C.setText` only. No `setInterval`, no extra animation loops.
 - Pick units so the last digit of each live number moves at least about once a second. The smoke test checks it.
 - Use the shared goal markup (`.goal`, `.goal-row`, `.goal-bar` with `<i>` fill and `<span>` marker, `.verdict` with
-  `ok` / `near` / `bad`) and the same verdict words: On track, Close, Off track, Going backwards.
+  `ok` / `near` / `bad`). For goals measured as a pace (growth or cut per year), use `C.verdict` and its words: On
+  track, Close, Off track, Going backwards. Goals of another kind may use clearer words of their own (the Jobs Clock's
+  Keeping up / Close / Falling behind), as long as `ok` / `near` / `bad` mean the same thing.
+- State every verdict's thresholds on the page (for example "Close means at least 85% of the pace needed").
 - Colour by meaning (`.good` / `.bad`), and compare values as displayed.
 - Every bar must answer "how full, out of what?". No decorative bars.
 - Escape data text with `C.escapeHtml` before putting it into HTML.
