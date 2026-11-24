@@ -46,7 +46,7 @@ clock, using official targets wherever one exists:
 
 | Clock | Reference | Verdict today |
 |---|---|---|
-| Emissions | Remaining carbon budgets for 1.5°C, 1.7°C and 2°C (Global Carbon Budget 2026), plus the IPCC's 48% cut by 2030 | 1.5°C budget about 75% used; pace "Going the wrong way" |
+| Emissions | Remaining carbon budgets for 1.5°C, 1.7°C and 2°C (Global Carbon Budget 2026), plus the IPCC's 48% cut by 2030 | 1.5°C budget about 75% used; pace "Going backwards" |
 | Renewables | COP28 pledge: triple renewable capacity to at least 11,000 GW by 2030 | "Close" (15.5% growth vs 16.4% needed) |
 | Jobs | Net new jobs vs growth of the workforce; direction toward the UN's full-employment goal (SDG 8.5) | "Close" (97 jobs per 100 new workers); SDG "Getting worse" |
 

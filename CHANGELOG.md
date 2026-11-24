@@ -4,7 +4,13 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
-## v1.1.0 (2026-11)
+## v1.2.0 (2026-11)
+
+- New shared helpers, moved out of the clocks: `restOfWorld` (lagging places count with their projection; never
+  below 0), `changeClass` (good / bad / neutral, as displayed) and `trendText` ("▲ +1.2%").
+- Docs: no hard-coded pins in examples; verdict thresholds documented; fixes from a newcomer-agent review.
+
+## v1.1.0 (2026-11), commit `a797dbe`
 
 Fixes from a full code review. No breaking changes.
 
