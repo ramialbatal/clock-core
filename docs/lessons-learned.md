@@ -108,6 +108,29 @@ numbers were wrong or a country was missing. Check this list before adding a dat
 - `YEAR` is read once at page load. A tab open across New Year kept counting the old year. The ticker now reloads the
   page when the year changes.
 
+## From the full code review (November 2026)
+
+A review of all four repositories found about 80 issues. None had visibly broken a page, but several would have. The
+patterns worth remembering:
+
+- **Compare values as displayed, everywhere.** About ten places coloured or judged a raw number while showing a
+  rounded one ("0.0 pts" in green, "about 10.0 years" in red). Use `shown` / `shownSign` from clock-core for every
+  colour, arrow, word ("up from" / "down from") and verdict.
+- **Words must follow the numbers.** "Up from 16.2%" was hard-coded and became wrong when the hydro share fell.
+- **Countries whose data lags behind** the world's latest year were counted as zero, inflating "Rest of world". Use
+  each country's projection for the missing year, and only subtract years every country has.
+- **Pre-filled future rows:** OWID fills some not-yet-reported years with a few zeros; a row with fewer than half its
+  cells filled is treated as not reported.
+- **Switching views must never show one view's numbers under another's labels:** show the spinner until the new
+  view's data has loaded the first time.
+- **Optional data must not block the page**, and "Try again" must retry it too.
+- **One error must not freeze the page:** the ticker logs errors and keeps going; a page whose code can't load (CDN
+  down, old browser) shows the error box instead of spinning forever.
+- **CSS rules of equal weight: the later one wins.** A colour for "jobs lost" was silently overridden.
+- **Strict parsing:** `parseFloat("1,234")` is 1, and a blank year becomes year 0. Use `num` and let bad cells be
+  skipped.
+- **Every setting in `config.js` must be read by the code**, and every calculation must live in `model.js` with a test.
+
 ## Releasing
 
 ### Tag names are case-sensitive
