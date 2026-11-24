@@ -131,6 +131,12 @@ patterns worth remembering:
   skipped.
 - **Every setting in `config.js` must be read by the code**, and every calculation must live in `model.js` with a test.
 
+### CSS errors are silent
+- Moving the plain-language styles into clock-core left a stray `*/` after a comment. Browsers skip the broken rule
+  without any error, and the next rule was the one defining the tone colours, so every banner, card and badge lost
+  its colour while all tests passed. Now a clock-core test checks that comments and braces in `clock-core.css`
+  balance, and the smoke test fails if the answer banner has no colour stripe.
+
 ## Releasing
 
 ### Tag names are case-sensitive

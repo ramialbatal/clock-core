@@ -188,3 +188,15 @@ test("message, statusCard and badge build plain-language pieces", () => {
   assert.equal(badge("", "x"), "");
   assert.equal(badge("ok", "▼ Falling"), '<span class="badge ok">▼ Falling</span>');
 });
+
+test("clock-core.css is well-formed: comments and braces balance (a stray */ silently drops the next rule)", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const css = await readFile(new URL("../clock-core.css", import.meta.url), "utf8");
+  const opens = css.split("/*").length - 1, closes = css.split("*/").length - 1;
+  assert.equal(closes, opens, "every /* needs exactly one */");
+  const code = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.doesNotMatch(code, /\*\//, "a */ outside a comment");
+  let depth = 0;
+  for (const ch of code) { if (ch === "{") depth++; if (ch === "}") depth--; assert.ok(depth >= 0, "extra }"); }
+  assert.equal(depth, 0, "unclosed {");
+});

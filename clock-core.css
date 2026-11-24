@@ -272,7 +272,7 @@ dd.bad, .history td.bad, .bad-text { color: var(--bad); }
  *   section.standing > h2, .status-grid (statusCard() HTML), details.more-info
  *   .grid.collapsed (first six cards) + button.show-all#show-all (wireShowAll())
  *   details.method > summary > h2 "How we calculate this"
- * Tones: data-tone / class "ok" (green), "warn" (amber), "bad" (red). */ */
+ * Tones: data-tone / class "ok" (green), "warn" (amber), "bad" (red). */
 :root { --ok: var(--good); --warn: #ffb347; --tone: var(--bad); }
 [data-tone="ok"] { --tone: var(--ok); }
 [data-tone="warn"] { --tone: var(--warn); }
