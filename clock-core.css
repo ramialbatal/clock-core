@@ -39,7 +39,7 @@ a { color: var(--accent-2); }
 .label { margin: 0; color: var(--muted); text-transform: uppercase; font-size: .8rem; letter-spacing: .12em; }
 .big {
   font-family: var(--mono); font-weight: 700; color: var(--accent);
-  font-size: clamp(1.9rem, 7.5vw, 5rem); line-height: 1.1; margin: 10px 0 0;
+  font-size: clamp(1.5rem, 7.5vw, 5rem); line-height: 1.1; margin: 10px 0 0;
   font-variant-numeric: tabular-nums; text-shadow: 0 0 28px var(--glow);
   word-break: break-all;
 }
@@ -496,4 +496,15 @@ html[data-card] .embed-credit { margin-top: 10px; color: var(--text); opacity: .
   .gas-bar:not(:has(.gas-switch)) .help-btn { width: 32px; height: 32px; font-size: 1rem; }
   .hero .label { font-size: .92rem; }
   .unit { margin-bottom: 10px; }
+}
+/* Small, short phones (iPhone SE size): an even shorter stage and the answer's title only */
+@media (max-width: 640px) and (max-height: 640px) {
+  .has-scene { --stage-h: 205px; }
+  .top .wrap > h1 { font-size: 1.35rem; }
+  .answer { padding: 12px 14px 12px; }
+  .answer-text { display: none; }
+  .act-open { margin-top: 8px; }
+  .hero { padding: 14px 12px; }
+  .hero .label { font-size: .85rem; }
+  .big { margin-top: 4px; }
 }
