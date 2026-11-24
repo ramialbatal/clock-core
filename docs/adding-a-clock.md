@@ -30,7 +30,13 @@ the rule here first rather than quietly breaking it in one clock.
 3. Set the five colour variables in `theme.css`, the `smoke` settings in `package.json` (which elements must tick,
    which verdicts must show), and the texts.
 4. Turn on GitHub Pages (Settings, Pages, "Deploy from a branch", `main`, `/ (root)`).
+   Before you do, check that the clock-core URLs in `index.html` return 200: Pages takes over the address immediately.
 5. Link it from the other clocks' footers, the personal site and the GitHub profile.
+6. Make it findable: add `sitemap.xml`, `llms.txt` and the `google-site-verification` meta tag (copy them from another
+   clock), add the new sitemap to `robots.txt` in the website repository, then submit it in Google Search Console
+   (property `https://ramialbatal.github.io/`) and request indexing for the new address.
+7. Describe each dataset in the page's structured data (`isBasedOn`) with a `description` and, where known, a
+   `license`; Google flags datasets without a description.
 
 ## 3. Reuse, don't copy
 
@@ -86,3 +92,4 @@ the rule here first rather than quietly breaking it in one clock.
 - [ ] The goal section shows target, where we should be now, actual pace and a verdict, with sources.
 - [ ] Link preview image (`img/og-image.png`, 1200×630) regenerated if the header changed, and checked by eye for dashes.
 - [ ] README (data, method, goal, licences) and these notes updated if anything changed.
+- [ ] New clocks: sitemap, `llms.txt`, verification tag, sitemap listed in the website's `robots.txt` and submitted.
