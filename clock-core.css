@@ -353,7 +353,7 @@ details.method[open] > summary { margin-bottom: 12px; }
  * Markup: <body class="has-scene"> with <canvas class="scene" aria-hidden="true"></canvas> as its first child.
  * The header grows into a "stage" where the picture shows; the horizon is the header's bottom edge, and below it
  * the picture fades into the page. Text on top of it gets a dark backing so it stays easy to read. */
-.has-scene { --stage-h: clamp(290px, 16vw + 200px, 420px); }
+.has-scene { --stage-h: clamp(330px, 16vw + 200px, 420px); }   /* phones: room for the language row */
 .scene {
   position: absolute; top: 0; left: 0; z-index: -1; display: block; width: 100%; height: calc(var(--stage-h) + 360px);
   pointer-events: none;
@@ -392,10 +392,14 @@ html[data-i18n="pending"] body { visibility: hidden; }
 .lang-pick:hover { border-color: var(--accent-2); }
 .lang-pick:focus-within { border-color: var(--accent-2); outline: 2px solid var(--accent-2); outline-offset: 2px; }
 @media (max-width: 640px) { .lang-pick { position: static; order: -2; align-self: flex-end; margin: 0 0 8px; height: 32px; } }
-/* Numbers keep their left-to-right order inside right-to-left text */
-[dir="rtl"] .big, [dir="rtl"] .ytd, [dir="rtl"] dd, [dir="rtl"] .goal-num, [dir="rtl"] .goal-side,
-[dir="rtl"] .history td, [dir="rtl"] pre, [dir="rtl"] .spark-wrap figcaption b { direction: ltr; unicode-bidi: isolate; }
+/* Right to left: elements that hold only a number keep left-to-right order; labels next to numbers (".ytd small",
+   "dd", ".goal-side"...) read right to left in the page font, since the code font has no Arabic letters. Signs stay
+   in front through signed(). */
+[dir="rtl"] .big, [dir="rtl"] .goal-num, [dir="rtl"] .ytd .num, [dir="rtl"] pre { direction: ltr; unicode-bidi: isolate; }
 [dir="rtl"] pre { text-align: left; }
+[dir="rtl"] .ytd small, [dir="rtl"] dd, [dir="rtl"] .goal-side, [dir="rtl"] .history td, [dir="rtl"] .spark-wrap figcaption {
+  font-family: system-ui, -apple-system, "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+}
 [dir="rtl"] body { font-family: system-ui, -apple-system, "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif; }
 
 /* ---- Embeds: "Put this clock on your website" and the widget (?embed=1 sets <html data-embed>) ---- */
