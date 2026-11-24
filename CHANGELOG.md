@@ -4,7 +4,13 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
-## v1.6.0 (2026-11)
+## v1.7.0 (2026-11)
+
+- "Add to your site" moves from the bottom of the page to the top: a small pill next to the language picker, in a
+  shared `.top-tools` row (top corner on wide screens, its own row on phones). New string `core.embed.short`.
+- Tablets and small windows: the header starts lower so the centred title never meets the corner tools.
+
+## v1.6.0 (2026-11), commit `b8f5dd7`
 
 Translation review by language: plainer, more natural French, Spanish and Arabic.
 

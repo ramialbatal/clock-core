@@ -194,7 +194,8 @@ Every clock speaks English, French, Spanish and Arabic. Arabic is written right 
 
 `?embed=1` turns a clock into a small widget: the scene strip with the clock's name, the coloured answer and the live
 number, plus "Open the full clock". The inline script marks it (`<html data-embed>`) and clock-core.css hides the
-rest. `wireEmbed(footer)` adds "Put this clock on your website" to the full page: a dialog with the one-line
+rest. `wireEmbed(footer)` adds a small "Add to your site" button to the top row, next to the language picker (the
+footer is only a fallback); it opens "Put this clock on your website": a dialog with the one-line
 `<iframe>` code (in the language and view on screen), a Copy button and a live preview. The smoke test checks the
 widget fits a 360 by 300 frame.
 
