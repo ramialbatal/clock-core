@@ -103,7 +103,7 @@ const STRINGS = {
     "core.showYearly": "Show yearly values", "core.yearly": "Yearly data", "core.hideYearly": "Hide yearly data",
     "core.showAll": "Show all {n} countries", "core.error": "Something went wrong while loading the data.",
     "core.language": "Language", "core.close.button": "Close",
-    "core.embed.button": "Put this clock on your website", "core.embed.title": "Put this clock on your website",
+    "core.embed.short": "Add to your site", "core.embed.button": "Put this clock on your website", "core.embed.title": "Put this clock on your website",
     "core.embed.text": "Copy this code into your page. The clock keeps itself up to date, in the language and view you have open now.",
     "core.embed.copy": "Copy code", "core.embed.copied": "Copied", "core.embed.preview": "Preview",
     "core.embed.credit": "Open the full clock",
@@ -113,7 +113,7 @@ const STRINGS = {
     "core.showYearly": "Voir les valeurs annuelles", "core.yearly": "Données annuelles", "core.hideYearly": "Masquer les données annuelles",
     "core.showAll": "Voir les {n} pays", "core.error": "Un problème est survenu pendant le chargement des données.",
     "core.language": "Langue", "core.close.button": "Fermer",
-    "core.embed.button": "Ajouter cette horloge à votre site", "core.embed.title": "Ajouter cette horloge à votre site",
+    "core.embed.short": "Ajouter à votre site", "core.embed.button": "Ajouter cette horloge à votre site", "core.embed.title": "Ajouter cette horloge à votre site",
     "core.embed.text": "Copiez ce code dans votre page. L’horloge se met à jour toute seule, dans la langue et l’affichage que vous avez à l’écran.",
     "core.embed.copy": "Copier le code", "core.embed.copied": "Copié", "core.embed.preview": "Aperçu",
     "core.embed.credit": "Ouvrir l’horloge complète",
@@ -123,7 +123,7 @@ const STRINGS = {
     "core.showYearly": "Ver los datos anuales", "core.yearly": "Datos anuales", "core.hideYearly": "Ocultar los datos anuales",
     "core.showAll": "Ver todos los países ({n})", "core.error": "Hubo un problema al cargar los datos.",
     "core.language": "Idioma", "core.close.button": "Cerrar",
-    "core.embed.button": "Pon este reloj en tu web", "core.embed.title": "Pon este reloj en tu web",
+    "core.embed.short": "Añadir a tu web", "core.embed.button": "Pon este reloj en tu web", "core.embed.title": "Pon este reloj en tu web",
     "core.embed.text": "Copia este código en tu página. El reloj se actualiza solo, en el idioma y la vista que tienes ahora.",
     "core.embed.copy": "Copiar código", "core.embed.copied": "Copiado", "core.embed.preview": "Vista previa",
     "core.embed.credit": "Abrir el reloj completo",
@@ -133,7 +133,7 @@ const STRINGS = {
     "core.showYearly": "عرض القيم السنوية", "core.yearly": "البيانات السنوية", "core.hideYearly": "إخفاء البيانات السنوية",
     "core.showAll": "عرض كل الدول ({n})", "core.error": "حدث خطأ أثناء تحميل البيانات.",
     "core.language": "اللغة", "core.close.button": "إغلاق",
-    "core.embed.button": "ضع هذه الساعة على موقعك", "core.embed.title": "ضع هذه الساعة على موقعك",
+    "core.embed.short": "أضفها إلى موقعك", "core.embed.button": "ضع هذه الساعة على موقعك", "core.embed.title": "ضع هذه الساعة على موقعك",
     "core.embed.text": "انسخ هذا الرمز وضعه في صفحتك. تُحدَّث الساعة تلقائيًا، باللغة والعرض الظاهرين الآن.",
     "core.embed.copy": "نسخ الرمز", "core.embed.copied": "تم النسخ", "core.embed.preview": "معاينة",
     "core.embed.credit": "افتح الساعة كاملة",
@@ -819,6 +819,9 @@ export function addLangPicker(where) {
     <select aria-label="${escapeHtml(t("core.language"))}">${Object.entries(LANGS)
       .map(([c, name]) => `<option value="${c}" lang="${c}"${c === current ? " selected" : ""}>${name}</option>`).join("")}</select>`;
   const select = /** @type {HTMLSelectElement} */ (label.querySelector("select"));
+  // The page's small tools (language, "Add to your site") share one row at the top
+  let tools = where.querySelector(".top-tools");
+  if (!tools) { tools = document.createElement("div"); tools.className = "top-tools"; where.prepend(tools); }
   select.addEventListener("change", () => {
     const code = asLang(select.value);
     try { localStorage.setItem("clock-lang", code); } catch { /* private mode: the URL still carries it */ }
@@ -826,7 +829,7 @@ export function addLangPicker(where) {
     if (code === "en") url.searchParams.delete("lang"); else url.searchParams.set("lang", code);
     location.assign(url.href);
   });
-  where.prepend(label);
+  tools.append(label);
 }
 
 /**
@@ -864,9 +867,10 @@ export function clockUrl({ embed = false } = {}) {
 
 /**
  * Set the page up for its two roles. As a widget: links open in a new tab and a small "Open the full clock" link is
- * added at the bottom. As the full page: adds the "Put this clock on your website" button to `where` (the footer),
- * which opens a dialog with the code to copy and a live preview.
- * @param {Element | null} where
+ * added at the bottom. As the full page: adds a small "Add to your site" button in the top row next to the language
+ * picker (or at the start of `where` when there is no picker), which opens a dialog with the code to copy and a live
+ * preview.
+ * @param {Element | null} where  fallback place for the button (the footer)
  */
 export function wireEmbed(where) {
   if (isEmbed()) {
@@ -879,12 +883,14 @@ export function wireEmbed(where) {
     document.querySelectorAll("a").forEach((a) => { a.target = "_blank"; a.rel = "noopener"; });
     return;
   }
-  if (!where) return;
+  const host = document.querySelector(".top-tools") ?? where;
+  if (!host) return;
   const open = document.createElement("button");
   open.type = "button";
   open.className = "embed-open";
-  open.innerHTML = `<span aria-hidden="true">&lt;/&gt;</span> ${escapeHtml(t("core.embed.button"))}`;
-  where.prepend(open);
+  open.title = t("core.embed.button");
+  open.innerHTML = `<span aria-hidden="true">&lt;/&gt;</span> ${escapeHtml(t("core.embed.short"))}`;
+  host.prepend(open);
   /** @type {HTMLDialogElement | null} */
   let dlg = null;
   open.addEventListener("click", () => {

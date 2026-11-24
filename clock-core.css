@@ -379,19 +379,31 @@ details.method[open] > summary { margin-bottom: 12px; }
  * data-i18n="pending" until translatePage() has run (so visitors never see the English flash by). */
 html[data-i18n="pending"] body { visibility: hidden; }
 .top { position: relative; }
-.lang-pick {
-  position: absolute; top: 14px; inset-inline-end: 16px; z-index: 2;
+/* The top row of small tools: "Add to your site" and the language picker. Top corner on wide screens; on phones a
+   row of its own above everything, with the two at either end. */
+.top-tools { position: absolute; top: 14px; inset-inline-end: 16px; z-index: 2; display: flex; align-items: center; gap: 8px; }
+.lang-pick, .embed-open {
+  position: relative;
   display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px;
   border: 1px solid var(--line); border-radius: 999px; background: rgba(14,19,18,.72);
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   color: var(--text); font-size: .82rem; font-weight: 600; letter-spacing: .04em; cursor: pointer;
 }
 .lang-pick svg { width: 16px; height: 16px; opacity: .85; }
+.embed-open { margin: 0; font-family: inherit; font-weight: 600; letter-spacing: 0; color: var(--muted); }
+.embed-open span { font-family: var(--mono); color: var(--accent-2); font-size: .78rem; }
+.embed-open:hover, .embed-open:focus-visible { border-color: var(--accent-2); color: var(--text); outline: none; }
 /* The real <select> covers the pill, invisible: tapping opens the device's own list */
 .lang-pick select { position: absolute; inset: 0; width: 100%; margin: 0; opacity: 0; cursor: pointer; font-size: 16px; }
 .lang-pick:hover { border-color: var(--accent-2); }
 .lang-pick:focus-within { border-color: var(--accent-2); outline: 2px solid var(--accent-2); outline-offset: 2px; }
-@media (max-width: 640px) { .lang-pick { position: static; order: -2; align-self: flex-end; margin: 0 0 8px; height: 32px; } }
+/* Tablets and small windows: the centred title could reach the corner tools, so the header starts lower */
+@media (min-width: 641px) and (max-width: 1100px) { .top, .has-scene .top { padding-top: 64px; } }
+@media (max-width: 640px) {
+  .top-tools { position: static; order: -2; align-self: stretch; justify-content: space-between; margin: 0 0 8px; }
+  .lang-pick, .embed-open { height: 32px; }
+  .top-tools .lang-pick:only-child { margin-inline-start: auto; }
+}
 /* Right to left: elements that hold only a number keep left-to-right order; labels next to numbers (".ytd small",
    "dd", ".goal-side"...) read right to left in the page font, since the code font has no Arabic letters. Signs stay
    in front through signed(). */
@@ -403,12 +415,6 @@ html[data-i18n="pending"] body { visibility: hidden; }
 [dir="rtl"] body { font-family: system-ui, -apple-system, "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif; }
 
 /* ---- Embeds: "Put this clock on your website" and the widget (?embed=1 sets <html data-embed>) ---- */
-.embed-open {
-  display: inline-flex; align-items: center; gap: 8px; margin: 0 0 18px; padding: 10px 18px;
-  background: transparent; color: var(--accent-2); border: 1px solid var(--line); border-radius: 999px; font-size: .9rem;
-}
-.embed-open span { font-family: var(--mono); font-size: .85rem; }
-.embed-open:hover, .embed-open:focus-visible { border-color: var(--accent-2); outline: none; }
 .embed-code {
   display: block; width: 100%; min-height: 96px; resize: vertical; padding: 10px 12px;
   background: #0d1211; color: var(--text); border: 1px solid var(--line); border-radius: 10px;
