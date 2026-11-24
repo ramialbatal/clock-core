@@ -4,7 +4,12 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
-## v1.8.1 (2026-11)
+## v1.8.2 (2026-11)
+
+- Small, short phones (iPhone SE size): an even shorter stage and the answer's title only; the big counter shrinks
+  so 12-digit numbers stay on one line at 320 px.
+
+## v1.8.1 (2026-11), commit `c48c54e`
 
 - Phones: the answer and the live number fit on the first screen. Shorter stage without the subtitle, the coloured dot
   on the same line as the answer (everywhere), only the answer's first sentence (`showAnswer` puts the rest in
