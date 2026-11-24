@@ -32,6 +32,16 @@
  * @typedef {{ cls: "ok" | "near" | "bad" | "", text: string }} Verdict
  */
 
+/**
+ * Tone of a plain-language message: "ok" (green), "warn" (amber) or "bad" (red).
+ * @typedef {"ok" | "warn" | "bad"} Tone
+ */
+
+/**
+ * A plain-language message for visitors: a tone, its icon, a short title and, optionally, one sentence.
+ * @typedef {{ tone: Tone, icon: string, title: string, text?: string }} Message
+ */
+
 // ---- Time (all UTC) --------------------------------------------------------
 
 /** The current year, read once at load. The ticker reloads the page when it changes. */
@@ -332,6 +342,21 @@ export function trendText(growth) {
   return (s > 0 ? "▲ " : s < 0 ? "▼ " : "") + signed(growth * 100, fmt[1]) + "%";
 }
 
+// ---- Plain-language messages ---------------------------------------------------------
+
+/** @type {Record<Tone, string>} */
+export const TONE_ICON = { ok: "🟢", warn: "🟠", bad: "🔴" };
+
+/**
+ * Build a message: `message("bad", "We're heading the wrong way", "One short sentence.")`.
+ * Each clock keeps its own wording in js/messages.js and builds messages with this.
+ * @param {Tone} tone
+ * @param {string} title
+ * @param {string} [text]
+ * @returns {Message}
+ */
+export const message = (tone, title, text) => ({ tone, icon: TONE_ICON[tone], title, ...(text ? { text } : {}) });
+
 // ---- Rendering (returns HTML strings or touches given elements) ---------------------
 
 /**
@@ -359,6 +384,56 @@ export function sparkline(years, values, { caption = "", change = null, changeTe
       <figcaption aria-hidden="${label ? "true" : "false"}">${escapeHtml(caption)} <b class="${isGood == null ? "" : isGood ? "up" : "down"}">${escapeHtml(changeText)}</b></figcaption>
       ${label ? `<span class="sr-only">${escapeHtml(label)}</span>` : ""}
     </figure>`;
+}
+
+/**
+ * HTML for one traffic-light card under "Where we stand": a small label, the icon and short title, an optional
+ * bar (percentage filled, coloured by tone), and one sentence.
+ * @param {{ label: string, msg: Message, pct?: number | null, barLabel?: string }} card
+ */
+export function statusCard({ label, msg, pct = null, barLabel = "" }) {
+  const bar = pct == null ? ""
+    : `<div class="sc-bar" role="img" aria-label="${escapeHtml(barLabel || `${fmt[0].format(pct)}%`)}"><i style="width:${Math.min(Math.max(pct, 0), 100)}%"></i></div>`;
+  return `<article class="status-card" data-tone="${msg.tone}">
+      <p class="sc-label">${escapeHtml(label)}</p>
+      <p class="sc-title"><span aria-hidden="true">${msg.icon}</span> ${escapeHtml(msg.title)}</p>
+      ${bar}
+      <p class="sc-text">${escapeHtml(msg.text ?? "")}</p>
+    </article>`;
+}
+
+/**
+ * HTML for a small coloured badge, e.g. `badge("ok", "▼ Falling")`. Empty tone gives no badge.
+ * @param {Tone | ""} tone
+ * @param {string} label
+ */
+export const badge = (tone, label) => (tone ? `<span class="badge ${tone}">${escapeHtml(label)}</span>` : "");
+
+/**
+ * Show a message in the answer banner at the top of the page (#answer, #answer-icon, #answer-title, #answer-text).
+ * @param {Message} m
+ */
+export function showAnswer(m) {
+  const box = document.getElementById("answer");
+  if (!box) return;
+  box.dataset.tone = m.tone;
+  const set = (/** @type {string} */ id, /** @type {string} */ t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+  set("answer-icon", m.icon);
+  set("answer-title", m.title);
+  set("answer-text", m.text ?? "");
+}
+
+/**
+ * Keep a long card list short: the grid's "collapsed" class shows the first six cards (CSS); the button
+ * reveals the rest and then hides itself.
+ * @param {HTMLElement} grid
+ * @param {HTMLElement} button
+ * @param {number} total   number of cards
+ */
+export function wireShowAll(grid, button, total) {
+  button.textContent = `Show all ${total} countries`;
+  button.hidden = !grid.classList.contains("collapsed") || total <= 6;
+  button.onclick = () => { grid.classList.remove("collapsed"); button.hidden = true; };
 }
 
 /**

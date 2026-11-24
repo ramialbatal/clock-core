@@ -4,6 +4,14 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
+## v1.3.0 (2026-11)
+
+The plain-language design, shared by all clocks: answer first, a few traffic lights, details on demand.
+
+- New: `Tone` and `Message` types, `TONE_ICON`, `message`, `showAnswer`, `statusCard`, `badge`, `wireShowAll`.
+- CSS: answer banner, traffic-light status cards, badges, "More" fold-outs (`details.more-info`), "Show all" list,
+  folding "How we calculate this" (`details.method`). Markup is documented at the top of that CSS block.
+
 ## v1.2.0 (2026-11), commit `93c4576`
 
 - New shared helpers, moved out of the clocks: `restOfWorld` (lagging places count with their projection; never

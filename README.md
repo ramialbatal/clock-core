@@ -44,6 +44,7 @@ The clock then sets its colours in its own `css/theme.css`: `--accent`, `--accen
 | Data | `fetchText`, `fetchCsv`, `fetchJson`, `parseCsv`, `num`, `seriesByCode`, `namesByCode`, `once` | Strict parsing (bad cells are skipped, not misread); `once` caches a loader and retries after a failure |
 | Models | `project`, `interpolateMidYear`, `neededGrowth`, `verdict`, `restOfWorld` | Pure functions, unit tested; `verdict` works for rising and falling goals ("Close" = at least 85% of the needed pace) |
 | Rendering | `sparkline`, `changeClass`, `trendText`, `wireHistory`, `sortInto`, `showVerdict` | Colours follow which direction is good, as displayed |
+| Messages | `message`, `TONE_ICON`, `showAnswer`, `statusCard`, `badge`, `wireShowAll` | The plain-language layout: answer banner, traffic-light cards, badges, short lists |
 | Ticker | `startTicker`, `stopTicker`, `setText` | About 10 redraws a second, writes only changed text, survives errors, reloads at New Year |
 | Page | `setState`, `wireHelp`, `fill`, `showVerdict` | Loading, ready and error states; the "?" pop-up; verdict badges |
 
