@@ -260,7 +260,7 @@ test("languages: every language has clock-core's strings, with the same placehol
   const keys = (code) => { setLang(code); return Object.keys(LANGS).length && ["core.onTrack", "core.close", "core.offTrack",
     "core.backwards", "core.na", "core.showYearly", "core.yearly", "core.hideYearly", "core.showAll", "core.error", "core.language",
     "core.close.button", "core.embed.button", "core.embed.title", "core.embed.text", "core.embed.copy", "core.embed.copied",
-    "core.embed.preview", "core.embed.credit", "core.embed.short"]; };
+    "core.embed.preview", "core.embed.credit", "core.embed.short", "core.act.button", "core.act.intro", "core.act.source", "core.done", "core.stats"]; };
   try {
     for (const code of Object.keys(LANGS)) {
       for (const k of keys(code)) {

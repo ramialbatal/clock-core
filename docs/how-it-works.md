@@ -199,6 +199,27 @@ footer is only a fallback); it opens "Put this clock on your website": a dialog 
 `<iframe>` code (in the language and view on screen), a Copy button and a live preview. The smoke test checks the
 widget fits a 360 by 300 frame.
 
+## "What can I do?"
+
+Each clock lists three actions in `js/actions.js` (icon, key, source, link): one for everyday life, one close to home,
+one to ask of leaders. Their words are the `act.<key>.t` and `act.<key>.x` keys in every language. `C.wireActions`
+puts a small button under the answer that opens them in a sheet. Keep each claim to what its source says.
+
+## Visit counts
+
+`<meta name="clock-stats" content="https://<code>.goatcounter.com/count">` turns on `C.startStats()`: one anonymous
+count per page view (no cookies, no personal data), recorded with its view and language, e.g.
+`/emissions-clock/methane?lang=fr`; widgets as `.../embed`, with the embedding site as the referrer. `C.track()`
+counts a few clicks (language changes, "Add to your site", "What can I do?"). Nothing is counted on localhost or in
+automated browsers, so tests never show up. A one-line privacy note goes in the footer.
+
+## Share pictures
+
+`npm run og-image` photographs the widget in card mode (`?embed=1&card=1`, 600 by 315 at double density) into
+`img/og-image.png`, the link-preview picture. A weekly GitHub Action (`.github/workflows/og-image.yml`) does it
+every Monday and commits the picture when it changed, so shared links show that week's answer and number. Link
+previews can't change by language on a static site, so the picture is in English.
+
 ## Displaying numbers
 
 - Choose units so the main numbers visibly move (MWh not TWh, tonnes not gigatonnes, kW not GW).

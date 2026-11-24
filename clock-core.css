@@ -102,7 +102,7 @@ body[data-state="ready"] .error-only { display: none; }
 /* Respect "reduce motion": slow the spinner, drop the other animations and transitions */
 @media (prefers-reduced-motion: reduce) {
   .spinner { animation-duration: 3s; }
-  .ready-only, dialog:is(#help, #embed)[open] { animation: none !important; }
+  .ready-only, dialog:is(#help, #embed, #act)[open] { animation: none !important; }
   button, .gas-switch button, button.more span { transition: none !important; }
 }
 button {
@@ -176,13 +176,13 @@ button.more.open span { transform: rotate(180deg); }
 .help-btn:hover, .help-btn:focus-visible { border-color: var(--accent-2); outline: none; }
 .link-btn { margin: 0; padding: 0; background: none; color: var(--accent-2); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
-dialog:is(#help, #embed) {
+dialog:is(#help, #embed, #act) {
   padding: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); color: var(--text);
   width: min(620px, calc(100% - 32px)); max-height: min(88vh, 900px); max-height: min(88dvh, 900px); overflow: hidden;
 }
-dialog:is(#help, #embed)[open] { display: flex; flex-direction: column; }
-dialog:is(#help, #embed)::backdrop { background: rgba(0,0,0,.65); backdrop-filter: blur(2px); }
-dialog:is(#help, #embed)[open] { animation: pop .22s ease-out; }
+dialog:is(#help, #embed, #act)[open] { display: flex; flex-direction: column; }
+dialog:is(#help, #embed, #act)::backdrop { background: rgba(0,0,0,.65); backdrop-filter: blur(2px); }
+dialog:is(#help, #embed, #act)[open] { animation: pop .22s ease-out; }
 @keyframes pop { from { opacity: 0; transform: translateY(12px); } }
 .sheet-head {
   flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -217,12 +217,12 @@ dialog:is(#help, #embed)[open] { animation: pop .22s ease-out; }
 
 /* Bottom sheet on phones */
 @media (max-width: 640px) {
-  dialog:is(#help, #embed) {
+  dialog:is(#help, #embed, #act) {
     width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 18px 18px 0 0; border-bottom: 0;
     max-height: 90vh; max-height: 90dvh;
   }
   .sheet-head { padding-block: 12px 10px; padding-inline: 16px 12px; }
-  dialog:is(#help, #embed)[open] { animation: slideup .25s ease-out; }
+  dialog:is(#help, #embed, #act)[open] { animation: slideup .25s ease-out; }
   @keyframes slideup { from { transform: translateY(40px); opacity: .4; } }
   .sheet { padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
 }
@@ -447,3 +447,32 @@ html[data-embed] .unit { margin: 2px 0 0; font-size: .82rem; }
 html[data-embed] .status { padding: 28px 12px; }
 .embed-credit { display: block; margin: 8px 0 10px; text-align: center; color: var(--muted); font-size: .8rem; text-decoration: none; }
 .embed-credit:hover { color: var(--accent-2); }
+
+/* ---- "What can I do?" (wireActions): a small button under the answer, a sheet with three actions ---- */
+.act-open {
+  display: inline-flex; align-items: center; gap: 6px; margin: 14px 0 0; padding: 7px 14px;
+  background: rgba(255,255,255,.06); color: var(--text); border: 1px solid var(--line); border-radius: 999px;
+  font-size: .9rem; font-weight: 600;
+}
+.act-open:hover, .act-open:focus-visible { border-color: var(--accent-2); outline: none; }
+.act-intro { color: var(--muted) !important; }
+.act { display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-top: 1px solid var(--line); }
+.act-icon { flex: none; font-size: 1.7rem; line-height: 1.2; }
+.act h3 { margin: 0 0 4px !important; color: var(--text) !important; font-size: 1.05rem !important; }
+.act p { margin: 0 0 6px !important; }
+.act-src { font-size: .8rem; color: var(--muted) !important; }
+html[data-embed] .act-open { display: none; }
+
+/* Privacy note for visit counts (startStats) */
+.stats-note { font-size: .78rem; opacity: .8; }
+
+/* ---- Share card (?embed=1&card=1): the widget laid out for a 1200x630 link preview, shot at 600x315 x2 ---- */
+html[data-card] body.has-scene { --stage-h: 84px; }
+html[data-card] .top { padding-top: 16px; }
+html[data-card] .top h1 { font-size: 1.35rem; }
+html[data-card] .wrap { padding: 0 28px; }
+html[data-card] .answer { padding: 10px 16px; margin-bottom: 10px; }
+html[data-card] .answer-title { font-size: 1.45rem; }
+html[data-card] .hero { padding: 12px 16px; }
+html[data-card] .big { font-size: 2.9rem; }
+html[data-card] .embed-credit { margin-top: 10px; color: var(--text); opacity: .75; font-size: .85rem; }

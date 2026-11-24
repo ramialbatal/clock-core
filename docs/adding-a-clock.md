@@ -109,6 +109,8 @@ the rule here first rather than quietly breaking it in one clock.
 - [ ] Every configured country has data, or the gap is explained.
 - [ ] The page leads with a plain-language answer and at most three traffic lights; details sit behind "More".
 - [ ] All four languages complete (`npm test`), and screenshots checked in Arabic (right to left) on a phone.
+- [ ] `js/actions.js` has three sourced actions, in all four languages; the `clock-stats` meta, `npm run og-image`
+      and `.github/workflows/og-image.yml` are in place (copy them from a clock).
 - [ ] The widget (`?embed=1`) shows the answer and the counter and fits a 360 by 300 frame.
 - [ ] The header scene reads at a glance and the title stays easy to read over it, on a laptop and at 375 px
       (screenshots of both), with "reduce motion" on too.

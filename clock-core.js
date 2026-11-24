@@ -99,6 +99,7 @@ export const asLang = (code) => (typeof code === "string" && Object.hasOwn(LANGS
 /** @type {Record<Lang, Record<string, string>>} */
 const STRINGS = {
   en: {
+    "core.act.button": "What can I do?", "core.act.intro": "Three things that make a real difference, backed by evidence.", "core.act.source": "Source", "core.done": "Got it", "core.stats": "Visits are counted anonymously with GoatCounter: no cookies, no personal data.",
     "core.na": "n/a", "core.onTrack": "On track", "core.close": "Close", "core.offTrack": "Off track", "core.backwards": "Going backwards",
     "core.showYearly": "Show yearly values", "core.yearly": "Yearly data", "core.hideYearly": "Hide yearly data",
     "core.showAll": "Show all {n} countries", "core.error": "Something went wrong while loading the data.",
@@ -109,6 +110,7 @@ const STRINGS = {
     "core.embed.credit": "Open the full clock",
   },
   fr: {
+    "core.act.button": "Que puis-je faire ?", "core.act.intro": "Trois gestes qui changent vraiment les choses, preuves à l’appui.", "core.act.source": "Source", "core.done": "Compris", "core.stats": "Les visites sont comptées anonymement avec GoatCounter : sans cookies ni données personnelles.",
     "core.na": "n.d.", "core.onTrack": "Sur la bonne voie", "core.close": "Presque", "core.offTrack": "Pas assez vite", "core.backwards": "Dans le mauvais sens",
     "core.showYearly": "Voir les valeurs annuelles", "core.yearly": "Données annuelles", "core.hideYearly": "Masquer les données annuelles",
     "core.showAll": "Voir les {n} pays", "core.error": "Un problème est survenu pendant le chargement des données.",
@@ -119,6 +121,7 @@ const STRINGS = {
     "core.embed.credit": "Ouvrir l’horloge complète",
   },
   es: {
+    "core.act.button": "¿Qué puedo hacer?", "core.act.intro": "Tres cosas que marcan una diferencia real, según los datos.", "core.act.source": "Fuente", "core.done": "Entendido", "core.stats": "Las visitas se cuentan de forma anónima con GoatCounter: sin cookies ni datos personales.",
     "core.na": "sin datos", "core.onTrack": "Va bien", "core.close": "Casi", "core.offTrack": "Demasiado lento", "core.backwards": "Va hacia atrás",
     "core.showYearly": "Ver los datos anuales", "core.yearly": "Datos anuales", "core.hideYearly": "Ocultar los datos anuales",
     "core.showAll": "Ver todos los países ({n})", "core.error": "Hubo un problema al cargar los datos.",
@@ -129,6 +132,7 @@ const STRINGS = {
     "core.embed.credit": "Abrir el reloj completo",
   },
   ar: {
+    "core.act.button": "ماذا يمكنني أن أفعل؟", "core.act.intro": "ثلاثة أمور تُحدث فرقًا حقيقيًا، تدعمها الأدلة.", "core.act.source": "المصدر", "core.done": "فهمت", "core.stats": "تُحتسب الزيارات دون تحديد الهوية عبر GoatCounter: بلا ملفات تعريف الارتباط ولا بيانات شخصية.",
     "core.na": "غير متاح", "core.onTrack": "على المسار الصحيح", "core.close": "قريب", "core.offTrack": "أبطأ من اللازم", "core.backwards": "يتراجع",
     "core.showYearly": "عرض القيم السنوية", "core.yearly": "البيانات السنوية", "core.hideYearly": "إخفاء البيانات السنوية",
     "core.showAll": "عرض كل الدول ({n})", "core.error": "حدث خطأ أثناء تحميل البيانات.",
@@ -827,6 +831,7 @@ export function addLangPicker(where) {
     try { localStorage.setItem("clock-lang", code); } catch { /* private mode: the URL still carries it */ }
     const url = new URL(location.href);
     if (code === "en") url.searchParams.delete("lang"); else url.searchParams.set("lang", code);
+    track(`lang-${code}`);
     location.assign(url.href);
   });
   tools.append(label);
@@ -876,7 +881,11 @@ export function wireEmbed(where) {
   if (isEmbed()) {
     const credit = document.createElement("a");
     credit.className = "embed-credit";
-    credit.textContent = `${t("core.embed.credit")} ${isRtl() ? "↖" : "↗"}`;
+    // A share card (?card=1) shows the address instead of a link
+    credit.textContent = document.documentElement.hasAttribute("data-card")
+      ? (document.querySelector('link[rel="canonical"]')?.getAttribute("href") ?? location.href)
+        .replace(/^https?:\/\//, "").replace(/[?#].*$/, "").replace(/\/$/, "")
+      : `${t("core.embed.credit")} ${isRtl() ? "↖" : "↗"}`;
     document.body.append(credit);
     const point = () => { credit.href = clockUrl(); };
     point(); window.addEventListener("hashchange", point);
@@ -916,6 +925,7 @@ export function wireEmbed(where) {
         const code = /** @type {HTMLTextAreaElement} */ (d.querySelector(".embed-code"));
         try { await navigator.clipboard.writeText(code.value); } catch { code.select(); document.execCommand?.("copy"); }
         copy.textContent = t("core.embed.copied");
+        track("embed-copy");
         setTimeout(() => { copy.textContent = t("core.embed.copy"); }, 2000);
       });
     }
@@ -926,8 +936,99 @@ export function wireEmbed(where) {
     const preview = /** @type {HTMLIFrameElement} */ (dlg.querySelector(".embed-preview"));
     if (preview.src !== src) preview.src = src;
     dlg.showModal();
+    track("embed-open");
   });
 }
+
+// ---- "What can I do?": three evidence-based actions behind a button --------------------------
+
+/**
+ * One action: an icon, a key for its words (`act.<key>.t` title, `act.<key>.x` one sentence, in the clock's i18n
+ * files), and its source.
+ * @typedef {{ icon: string, key: string, source: string, url: string }} Action
+ */
+
+/**
+ * Add a small "What can I do?" button under the answer, opening a sheet with the actions (not in widgets).
+ * @param {Action[]} actions
+ * @param {Element | null} [where]  default: the answer banner (#answer)
+ */
+export function wireActions(actions, where = document.getElementById("answer")) {
+  if (!where || !actions.length || isEmbed()) return;
+  const open = document.createElement("button");
+  open.type = "button";
+  open.className = "act-open";
+  open.setAttribute("aria-haspopup", "dialog");
+  open.innerHTML = `<span aria-hidden="true">💡</span> ${escapeHtml(t("core.act.button"))}`;
+  where.append(open);
+  /** @type {HTMLDialogElement | null} */
+  let dlg = null;
+  open.addEventListener("click", () => {
+    if (!dlg) {
+      dlg = document.createElement("dialog");
+      dlg.id = "act";
+      dlg.setAttribute("aria-labelledby", "act-title");
+      dlg.innerHTML = `<header class="sheet-head"><h2 id="act-title">${escapeHtml(t("core.act.button"))}</h2>
+          <button type="button" class="close" aria-label="${escapeHtml(t("core.close.button"))}">×</button></header>
+        <div class="sheet">
+          <p class="act-intro">${escapeHtml(t("core.act.intro"))}</p>
+          ${actions.map((a) => `<article class="act">
+            <span class="act-icon" aria-hidden="true">${a.icon}</span>
+            <div><h3>${escapeHtml(t(`act.${a.key}.t`))}</h3><p>${escapeHtml(t(`act.${a.key}.x`))}</p>
+              <p class="act-src">${escapeHtml(t("core.act.source"))}: <a href="${escapeHtml(a.url)}" target="_blank" rel="noopener">${escapeHtml(a.source)}</a></p></div>
+          </article>`).join("")}
+          <button type="button" class="done">${escapeHtml(t("core.done"))}</button>
+        </div>`;
+      document.body.append(dlg);
+      const d = dlg;
+      d.querySelectorAll(".close, .done").forEach((b) => b.addEventListener("click", () => d.close()));
+      d.addEventListener("click", (e) => { if (e.target === d) d.close(); });
+    }
+    dlg.showModal();
+    /** @type {HTMLElement | null} */ (dlg.querySelector(".sheet"))?.scrollTo(0, 0);
+    track("act-open");
+  });
+}
+
+// ---- Visit counts: GoatCounter, no cookies, no personal data ------------------------------
+
+let statsUrl = "";
+
+/** @param {Record<string, string>} params */
+function hit(params) {
+  try { navigator.sendBeacon(`${statsUrl}?${new URLSearchParams({ ...params, rnd: Math.random().toString(36).slice(2) })}`); }
+  catch { /* counting must never break the page */ }
+}
+
+/**
+ * Count this visit, if the page names a counter in <meta name="clock-stats" content="https://<code>.goatcounter.com/count">.
+ * Counts only on the live site (*.github.io) and never automated browsers (tests). The page is recorded with its view
+ * and language, e.g. "/emissions-clock/methane?lang=fr"; widgets as ".../embed", with the embedding site as referrer.
+ * Adds a one-line privacy note to `noteIn` (the footer) whenever a counter is named.
+ * @param {Element | null} [noteIn]
+ */
+export function startStats(noteIn = document.querySelector("footer.foot")) {
+  const url = document.querySelector('meta[name="clock-stats"]')?.getAttribute("content") ?? "";
+  if (!url) return;
+  if (noteIn && !isEmbed()) {
+    const p = document.createElement("p");
+    p.className = "stats-note";
+    p.textContent = t("core.stats");
+    noteIn.append(p);
+  }
+  if (navigator.webdriver || !/\.github\.io$/.test(location.hostname) || !navigator.sendBeacon) return;
+  statsUrl = url;
+  const view = location.hash.slice(1);
+  const path = location.pathname + (isEmbed() ? "embed" : "") + (view ? (isEmbed() ? "/" : "") + view : "")
+    + (current !== "en" ? `?lang=${current}` : "");
+  hit({ p: path, t: document.title, r: document.referrer, s: `${screen.width},${screen.height},${devicePixelRatio}` });
+}
+
+/**
+ * Count an event (a click), e.g. track("embed-copy"). Does nothing unless startStats is counting.
+ * @param {string} name
+ */
+export function track(name) { if (statsUrl) hit({ p: name, t: name, e: "true" }); }
 
 // ---- Page chrome -------------------------------------------------------------------
 
