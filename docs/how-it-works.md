@@ -6,7 +6,7 @@ Each clock is its own open project, so people can contribute to one without touc
 
 | Repository | Contents | Served at |
 |---|---|---|
-| `clock-core` | Shared ES module and stylesheet, released with version tags | jsDelivr CDN, e.g. `clock-core@v1.0.0` |
+| `clock-core` | Shared ES module and stylesheet, released with version tags | jsDelivr CDN, pinned by tag or commit |
 | `emissions-clock`, `renewables-clock`, `jobs-clock` | One clock each | GitHub Pages: `ramialbatal.github.io/<repo>/` |
 | `ramialbatal.github.io` | Personal website only; links to the clocks | `ramialbatal.github.io` |
 
@@ -28,11 +28,14 @@ img/                  icon.svg, og-image.png (link preview, 1200×630)
 ## How a page loads
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@v1.0.0/clock-core.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@7f64264169149b91d119f75504cf419cf42475c2/clock-core.css">
 <link rel="stylesheet" href="css/theme.css">
-<script type="importmap">{ "imports": { "clock-core": "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@v1.0.0/clock-core.js" } }</script>
+<script type="importmap">{ "imports": { "clock-core": "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@7f64264169149b91d119f75504cf419cf42475c2/clock-core.js" } }</script>
 <script type="module" src="js/app.js"></script>
 ```
+
+The clocks currently pin clock-core v1.0.0 by its commit (`@7f64264…`), because that release was tagged `V1.0.0`
+with a capital V and jsDelivr treats tag names as case-sensitive. A tag or a commit both work; a commit never moves.
 
 The import map lets every module write `import * as C from "clock-core"`. In Node (tests, type checking) the same
 name resolves to the `clock-core` dev dependency, installed from the same release tag. To upgrade clock-core, change
