@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import {
   signed, pct, digits, escapeHtml, parseCsv, seriesByCode, namesByCode, num, shown, shownSign, project,
   interpolateMidYear, neededGrowth, verdict, sparkline, tYears, yearFraction, YEAR, fmt, once,
-  restOfWorld, changeClass, trendText, message, statusCard, badge, TONE_ICON, seeded,
+  restOfWorld, changeClass, trendText, signedPct, message, statusCard, badge, TONE_ICON, seeded,
   LANGS, addStrings, t, tOr, hasText, setLang, lang, locale, isRtl, asLang, regionName, flagRegion
 } from "../clock-core.js";
 
@@ -239,6 +239,8 @@ test("languages: numbers, percentages, signs and verdicts follow the language", 
     setLang("fr");
     assert.equal(fmt[1].format(1234.56), "1 234,6");
     assert.equal(pct(4.86), "4,9 %");
+    assert.equal(signedPct(2.8), "+2,8\u202f%");
+    assert.equal(signedPct(-0.04), "0,0\u202f%");
     assert.equal(verdict(0.1, 0.1).text, "Sur la bonne voie");
     setLang("es");
     assert.equal(fmt[0].format(12345), "12.345");
@@ -246,7 +248,8 @@ test("languages: numbers, percentages, signs and verdicts follow the language", 
     setLang("ar");
     assert.ok(isRtl());
     assert.equal(fmt[0].format(12345), "12,345");                        // Western digits in Arabic
-    assert.equal(signed(5), "⁦+5⁩");                          // isolated so the sign stays in front
+    assert.equal(signed(5), "⁦+5⁩");
+    assert.equal(pct(32, 0), "⁦32%⁩");                      // percentages too                          // isolated so the sign stays in front
     assert.equal(verdict(-0.1, 0.1).text, "يتراجع");
   } finally { setLang("en"); }
   assert.equal(signed(5), "+5");
@@ -255,7 +258,7 @@ test("languages: numbers, percentages, signs and verdicts follow the language", 
 
 test("languages: every language has clock-core's strings, with the same placeholders", () => {
   const keys = (code) => { setLang(code); return Object.keys(LANGS).length && ["core.onTrack", "core.close", "core.offTrack",
-    "core.backwards", "core.showYearly", "core.yearly", "core.hideYearly", "core.showAll", "core.error", "core.language",
+    "core.backwards", "core.na", "core.showYearly", "core.yearly", "core.hideYearly", "core.showAll", "core.error", "core.language",
     "core.close.button", "core.embed.button", "core.embed.title", "core.embed.text", "core.embed.copy", "core.embed.copied",
     "core.embed.preview", "core.embed.credit"]; };
   try {

@@ -99,7 +99,7 @@ export const asLang = (code) => (typeof code === "string" && Object.hasOwn(LANGS
 /** @type {Record<Lang, Record<string, string>>} */
 const STRINGS = {
   en: {
-    "core.onTrack": "On track", "core.close": "Close", "core.offTrack": "Off track", "core.backwards": "Going backwards",
+    "core.na": "n/a", "core.onTrack": "On track", "core.close": "Close", "core.offTrack": "Off track", "core.backwards": "Going backwards",
     "core.showYearly": "Show yearly values", "core.yearly": "Yearly data", "core.hideYearly": "Hide yearly data",
     "core.showAll": "Show all {n} countries", "core.error": "Something went wrong while loading the data.",
     "core.language": "Language", "core.close.button": "Close",
@@ -109,17 +109,17 @@ const STRINGS = {
     "core.embed.credit": "Open the full clock",
   },
   fr: {
-    "core.onTrack": "Sur la bonne voie", "core.close": "Presque", "core.offTrack": "Pas assez vite", "core.backwards": "En recul",
+    "core.na": "n.d.", "core.onTrack": "Sur la bonne voie", "core.close": "Presque", "core.offTrack": "Pas assez vite", "core.backwards": "Dans le mauvais sens",
     "core.showYearly": "Voir les valeurs annuelles", "core.yearly": "Données annuelles", "core.hideYearly": "Masquer les données annuelles",
     "core.showAll": "Voir les {n} pays", "core.error": "Un problème est survenu pendant le chargement des données.",
     "core.language": "Langue", "core.close.button": "Fermer",
-    "core.embed.button": "Mettre cette horloge sur votre site", "core.embed.title": "Mettre cette horloge sur votre site",
-    "core.embed.text": "Copiez ce code dans votre page. L'horloge se met à jour toute seule, dans la langue et la vue ouvertes en ce moment.",
+    "core.embed.button": "Ajouter cette horloge à votre site", "core.embed.title": "Ajouter cette horloge à votre site",
+    "core.embed.text": "Copiez ce code dans votre page. L’horloge se met à jour toute seule, dans la langue et l’affichage que vous avez à l’écran.",
     "core.embed.copy": "Copier le code", "core.embed.copied": "Copié", "core.embed.preview": "Aperçu",
-    "core.embed.credit": "Ouvrir l'horloge complète",
+    "core.embed.credit": "Ouvrir l’horloge complète",
   },
   es: {
-    "core.onTrack": "Va bien", "core.close": "Casi", "core.offTrack": "Demasiado lento", "core.backwards": "Va hacia atrás",
+    "core.na": "sin datos", "core.onTrack": "Va bien", "core.close": "Casi", "core.offTrack": "Demasiado lento", "core.backwards": "Va hacia atrás",
     "core.showYearly": "Ver los datos anuales", "core.yearly": "Datos anuales", "core.hideYearly": "Ocultar los datos anuales",
     "core.showAll": "Ver todos los países ({n})", "core.error": "Hubo un problema al cargar los datos.",
     "core.language": "Idioma", "core.close.button": "Cerrar",
@@ -129,12 +129,12 @@ const STRINGS = {
     "core.embed.credit": "Abrir el reloj completo",
   },
   ar: {
-    "core.onTrack": "على المسار الصحيح", "core.close": "قريب", "core.offTrack": "أبطأ من اللازم", "core.backwards": "يتراجع",
+    "core.na": "غير متاح", "core.onTrack": "على المسار الصحيح", "core.close": "قريب", "core.offTrack": "أبطأ من اللازم", "core.backwards": "يتراجع",
     "core.showYearly": "عرض القيم السنوية", "core.yearly": "البيانات السنوية", "core.hideYearly": "إخفاء البيانات السنوية",
-    "core.showAll": "عرض كل البلدان ({n})", "core.error": "حدث خطأ أثناء تحميل البيانات.",
+    "core.showAll": "عرض كل الدول ({n})", "core.error": "حدث خطأ أثناء تحميل البيانات.",
     "core.language": "اللغة", "core.close.button": "إغلاق",
     "core.embed.button": "ضع هذه الساعة على موقعك", "core.embed.title": "ضع هذه الساعة على موقعك",
-    "core.embed.text": "انسخ هذا الرمز إلى صفحتك. تتحدّث الساعة تلقائيًا، باللغة والعرض المفتوحين الآن.",
+    "core.embed.text": "انسخ هذا الرمز وضعه في صفحتك. تُحدَّث الساعة تلقائيًا، باللغة والعرض الظاهرين الآن.",
     "core.embed.copy": "نسخ الرمز", "core.embed.copied": "تم النسخ", "core.embed.preview": "معاينة",
     "core.embed.credit": "افتح الساعة كاملة",
   },
@@ -244,11 +244,27 @@ export function signed(x, f = fmt[0]) {
 }
 
 /**
- * "4.9%" (French: "4,9 %", with a narrow no-break space).
+ * A signed percentage: "+2.8%", "-0.5%" ("+2,8 %" in French). No sign when it shows as zero; isolated in right-to-left
+ * text like `signed`.
+ * @param {number} x  Percentage value (2.8 means +2.8%).
+ * @param {0|1|2|3} [d]
+ */
+export function signedPct(x, d = 1) {
+  const s = fmt[d].format(Math.abs(x));
+  const out = (/[1-9]/.test(s) ? (x > 0 ? "+" : "-") : "") + s + (current === "fr" ? "\u202f%" : "%");
+  return isRtl() ? `\u2066${out}\u2069` : out;
+}
+
+/**
+ * "4.9%" (French: "4,9 %", with a narrow no-break space). In right-to-left languages it is isolated, so it reads
+ * "4.9%" wherever it sits in a sentence.
  * @param {number} x  Percentage value (4.9 means 4.9%).
  * @param {0|1|2|3} [d]
  */
-export const pct = (x, d = 1) => fmt[d].format(x) + (current === "fr" ? "\u202f%" : "%");
+export function pct(x, d = 1) {
+  const out = fmt[d].format(x) + (current === "fr" ? "\u202f%" : "%");
+  return isRtl() ? `\u2066${out}\u2069` : out;   // same order ("32%") wherever it sits in right-to-left text
+}
 
 /**
  * Wrap each digit in a span so big counters don't jitter as digits change width.
@@ -480,9 +496,9 @@ export function changeClass(x, d, good) {
  * @param {number | null} growth  0.012 = 1.2%
  */
 export function trendText(growth) {
-  if (growth == null) return "n/a";
+  if (growth == null) return t("core.na");
   const s = shownSign(growth * 100, 1);
-  return (s > 0 ? "▲ " : s < 0 ? "▼ " : "") + signed(growth * 100, fmt[1]) + "%";
+  return (s > 0 ? "▲ " : s < 0 ? "▼ " : "") + signedPct(growth * 100, 1);
 }
 
 // ---- Plain-language messages ---------------------------------------------------------
