@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import {
   signed, pct, digits, escapeHtml, parseCsv, seriesByCode, namesByCode, num, shown, shownSign, project,
   interpolateMidYear, neededGrowth, verdict, sparkline, tYears, yearFraction, YEAR, fmt, once,
-  restOfWorld, changeClass, trendText, message, statusCard, badge, TONE_ICON
+  restOfWorld, changeClass, trendText, message, statusCard, badge, TONE_ICON, seeded
 } from "../clock-core.js";
 
 const close = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) < eps, `${a} is not close to ${b}`);
@@ -199,4 +199,14 @@ test("clock-core.css is well-formed: comments and braces balance (a stray */ sil
   let depth = 0;
   for (const ch of code) { if (ch === "{") depth++; if (ch === "}") depth--; assert.ok(depth >= 0, "extra }"); }
   assert.equal(depth, 0, "unclosed {");
+});
+
+test("seeded: the same seed gives the same numbers, all in [0, 1)", () => {
+  const a = seeded(42), b = seeded(42), c = seeded(43);
+  const xs = Array.from({ length: 1000 }, a);
+  assert.deepEqual(xs.slice(0, 5), Array.from({ length: 5 }, b));
+  assert.notEqual(xs[0], c());
+  assert.ok(xs.every((x) => x >= 0 && x < 1));
+  const mean = xs.reduce((s, x) => s + x, 0) / xs.length;
+  assert.ok(Math.abs(mean - 0.5) < 0.05, `mean ${mean}`);
 });

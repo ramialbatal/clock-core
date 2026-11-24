@@ -89,6 +89,8 @@ the rule here first rather than quietly breaking it in one clock.
 - Show at most three traffic-light cards and one number per country card. Everything else goes behind "More".
 - No jargon in what a visitor sees first ("budget", "trend", "GtCO₂", "projected" belong behind "More").
 - Put all wording in `js/messages.js` (built with `C.message`) and test it.
+- Give the header a scene (`js/scene.js`) that shows the topic at a glance, without getting in the way of the
+  text. See [Scenes](how-it-works.md#scenes-the-picture-behind-the-header).
 
 ## 8. Writing style
 
@@ -103,6 +105,8 @@ the rule here first rather than quietly breaking it in one clock.
 - [ ] `npm run smoke` passes (data loads, counters tick, verdicts show, no sideways scroll at 375 px, no console errors).
 - [ ] Every configured country has data, or the gap is explained.
 - [ ] The page leads with a plain-language answer and at most three traffic lights; details sit behind "More".
+- [ ] The header scene reads at a glance and the title stays easy to read over it, on a laptop and at 375 px
+      (screenshots of both), with "reduce motion" on too.
 - [ ] The goal section shows target, where we should be now, actual pace and a verdict, with sources.
 - [ ] Link preview image (`img/og-image.png`, 1200×630) regenerated if the header changed, and checked by eye for dashes.
 - [ ] README (data, method, goal, licences) and these notes updated if anything changed.

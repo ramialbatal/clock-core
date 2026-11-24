@@ -4,7 +4,17 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
-## v1.3.0 (2026-11)
+## v1.4.0 (2026-11)
+
+Scenes: an animated picture behind the top of each clock, so the page shows what it is about at a glance.
+
+- New: `startScene` (returns `stop` and `redraw`; handles pixel density, resizing, pauses off screen and in hidden tabs, a still frame for "reduce
+  motion", errors hide the picture and leave the page working), `seeded` (repeatable random numbers for layouts),
+  `SceneFrame` and `Scene` types.
+- CSS: `.has-scene` and `.scene`: the header becomes a stage for the picture, which fades into the page below it;
+  text on top of it gets a dark backing.
+
+## v1.3.0 (2026-11), commit `ec72aee`
 
 The plain-language design, shared by all clocks: answer first, a few traffic lights, details on demand.
 

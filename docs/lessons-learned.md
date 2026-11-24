@@ -104,6 +104,13 @@ numbers were wrong or a country was missing. Check this list before adding a dat
 - The first versions rewrote every number about 60 times a second. Now the ticker runs about 10 times a second and
   `setText` skips unchanged values.
 
+### Pictures behind text
+- The first renewables scene put the sun right behind the subtitle on phones, where the stage is shorter. Scenes now
+  keep bright things low and to the side, and every scene is checked in screenshots at laptop and phone width.
+- Thin, pale smoke read as friendly clouds, and a clean orange sun as a pretty sunset. To say "this is bad", the
+  emissions scene needed dense, dark plumes coming visibly out of chimneys and a dim sun behind brown haze.
+- Tiny dark figures in front of dark buildings were invisible. People in the jobs scene wear coloured clothes.
+
 ### Year rollover
 - `YEAR` is read once at page load. A tab open across New Year kept counting the old year. The ticker now reloads the
   page when the year changes.
