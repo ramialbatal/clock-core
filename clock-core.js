@@ -574,6 +574,7 @@ export const badge = (tone, label) => (tone ? `<span class="badge ${tone}">${esc
 
 /**
  * Show a message in the answer banner at the top of the page (#answer, #answer-icon, #answer-title, #answer-text).
+ * The text's first sentence always shows; later sentences go in a span.answer-more that phones hide.
  * @param {Message} m
  */
 export function showAnswer(m) {
@@ -583,7 +584,18 @@ export function showAnswer(m) {
   const set = (/** @type {string} */ id, /** @type {string} */ t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
   set("answer-icon", m.icon);
   set("answer-title", m.title);
-  set("answer-text", m.text ?? "");
+  // First sentence always; the rest in a span that phones hide (clock-core.css), so the live number fits on screen
+  const box2 = document.getElementById("answer-text");
+  if (box2) {
+    const [first, ...rest] = (m.text ?? "").split(/(?<=[.!?؟])\s+(?=\S)/);
+    box2.textContent = first ?? "";
+    if (rest.length) {
+      const more = document.createElement("span");
+      more.className = "answer-more";
+      more.textContent = " " + rest.join(" ");
+      box2.append(more);
+    }
+  }
 }
 
 /**

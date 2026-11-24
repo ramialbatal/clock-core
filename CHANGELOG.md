@@ -4,7 +4,13 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
-## v1.8.0 (2026-11)
+## v1.8.1 (2026-11)
+
+- Phones: the answer and the live number fit on the first screen. Shorter stage without the subtitle, the coloured dot
+  on the same line as the answer (everywhere), only the answer's first sentence (`showAnswer` puts the rest in
+  `span.answer-more`), a smaller "What can I do?", and a clock without a switch puts its "?" in the top row.
+
+## v1.8.0 (2026-11), commit `1574546`
 
 - "What can I do?": `wireActions` and the `Action` type: a small button under the answer opens three sourced actions.
 - Visit counts: `startStats` and `track` (GoatCounter: no cookies, no personal data; never on localhost or in tests).
