@@ -6,7 +6,7 @@ Each clock is its own open project, so people can contribute to one without touc
 
 | Repository | Contents | Served at |
 |---|---|---|
-| `clock-core` | Shared ES module and stylesheet, released with version tags | jsDelivr CDN, e.g. `clock-core@v1.0.0` |
+| `clock-core` | Shared ES module and stylesheet, released with version tags | jsDelivr CDN, pinned by tag or commit |
 | `emissions-clock`, `renewables-clock`, `jobs-clock` | One clock each | GitHub Pages: `ramialbatal.github.io/<repo>/` |
 | `ramialbatal.github.io` | Personal website only; links to the clocks | `ramialbatal.github.io` |
 

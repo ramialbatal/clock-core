@@ -28,7 +28,7 @@ notes cover clock-core and all three clocks.
 - **Every counter needs a reference point.** Each clock has a goal section: a bar that fills toward an official
   target, a pace check, and a verdict badge.
 - **One shared core, pinned by version.** Helpers used by more than one clock live in clock-core and are loaded from a
-  release (`clock-core@v1.0.0`). Never copy them into a clock.
+  release or exact commit. Never copy them into a clock.
 - **Tested.** Calculations are pure functions in each clock's `js/model.js`, with unit tests. A smoke test opens every
   page in a real browser with real data. Both run on every pull request.
 - **House style:** no em dashes or en dashes anywhere (text, code comments, images). `npm run style` checks it.
