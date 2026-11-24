@@ -123,6 +123,23 @@ so far  = annual × fraction of the year elapsed (UTC)
 - UN goal check: "Improving" if the ILO's estimate of unemployed people for next year is lower than this year's (in
   millions, as displayed), else "Getting worse".
 
+## Page layout: answer first, details on demand
+
+Every clock is written for a visitor who is not technical and reads quickly. Top to bottom:
+
+1. **The answer** (`section.answer`, filled by `C.showAnswer`): an icon, a short title and one sentence, in a colour:
+   green (good), amber (warning) or red (bad). For example 🔴 "We're heading the wrong way".
+2. **The live counter** (`section.hero`), with one human-scale line ("about 1,248 more every second").
+3. **Where we stand** (`section.standing`): two or three traffic-light cards from `C.statusCard`, each one short
+   title and one sentence.
+4. **Countries**: a coloured badge (`C.badge`) and one number per card; the first six show, the rest behind
+   "Show all" (`C.wireShowAll`).
+5. **Details on demand**: `details.more-info` ("More", "What do these mean?") and `details.method` ("How we
+   calculate this") hold every number, chart, method and source.
+
+All visitor-facing wording lives in each clock's `js/messages.js`, as pure functions that turn numbers into a
+`Message` (tone, icon, title, text), with tests in `test/messages.test.js`. The page code only displays them.
+
 ## Displaying numbers
 
 - Choose units so the main numbers visibly move (MWh not TWh, tonnes not gigatonnes, kW not GW).

@@ -82,18 +82,27 @@ the rule here first rather than quietly breaking it in one clock.
 - Escape data text with `C.escapeHtml` before putting it into HTML.
 - Show sources and the "fetched at" time on the page. Test at 375 px.
 
-## 7. Writing style
+## 7. Plain language first
+
+- Lead with the answer a non-technical visitor needs: is this good or bad, getting better or worse, how close are
+  we? One colour (green, amber, red), a short title, one sentence. See [Page layout](how-it-works.md#page-layout-answer-first-details-on-demand).
+- Show at most three traffic-light cards and one number per country card. Everything else goes behind "More".
+- No jargon in what a visitor sees first ("budget", "trend", "GtCO₂", "projected" belong behind "More").
+- Put all wording in `js/messages.js` (built with `C.message`) and test it.
+
+## 8. Writing style
 
 - **No em dashes or en dashes**, in text, code comments, alt text, `<title>`, share descriptions and images. Use
   commas, colons, brackets, full stops, or "to" for ranges ("2015 to 2025"; in tight spaces "2015-25").
 - Professional but approachable. Explain terms the first time ("carbon budget", "net new jobs").
 - Say what the numbers don't show (for example, unemployment leaves out people who stopped looking).
 
-## 8. Checklist before merging
+## 9. Checklist before merging
 
 - [ ] `npm run check` passes (style, types, unit tests); new calculations have tests.
 - [ ] `npm run smoke` passes (data loads, counters tick, verdicts show, no sideways scroll at 375 px, no console errors).
 - [ ] Every configured country has data, or the gap is explained.
+- [ ] The page leads with a plain-language answer and at most three traffic lights; details sit behind "More".
 - [ ] The goal section shows target, where we should be now, actual pace and a verdict, with sources.
 - [ ] Link preview image (`img/og-image.png`, 1200×630) regenerated if the header changed, and checked by eye for dashes.
 - [ ] README (data, method, goal, licences) and these notes updated if anything changed.

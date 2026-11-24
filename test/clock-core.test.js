@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import {
   signed, pct, digits, escapeHtml, parseCsv, seriesByCode, namesByCode, num, shown, shownSign, project,
   interpolateMidYear, neededGrowth, verdict, sparkline, tYears, yearFraction, YEAR, fmt, once,
-  restOfWorld, changeClass, trendText
+  restOfWorld, changeClass, trendText, message, statusCard, badge, TONE_ICON
 } from "../clock-core.js";
 
 const close = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) < eps, `${a} is not close to ${b}`);
@@ -175,4 +175,28 @@ test("changeClass and trendText follow the value as displayed", () => {
   assert.equal(trendText(-0.008), "▼ -0.8%");
   assert.equal(trendText(-0.0004), "0.0%");
   assert.equal(trendText(null), "n/a");
+});
+
+test("message, statusCard and badge build plain-language pieces", () => {
+  assert.deepEqual(message("bad", "Wrong way", "Short."), { tone: "bad", icon: TONE_ICON.bad, title: "Wrong way", text: "Short." });
+  assert.deepEqual(message("ok", "Fine"), { tone: "ok", icon: TONE_ICON.ok, title: "Fine" });
+  const html = statusCard({ label: "Safer limit <1.5°C>", msg: message("warn", "Running out", "About 8 years left."), pct: 140 });
+  assert.match(html, /data-tone="warn"/);
+  assert.match(html, /Safer limit &lt;1\.5°C&gt;/);
+  assert.match(html, /width:100%/);                       // clamped
+  assert.doesNotMatch(statusCard({ label: "x", msg: message("ok", "y") }), /sc-bar/);
+  assert.equal(badge("", "x"), "");
+  assert.equal(badge("ok", "▼ Falling"), '<span class="badge ok">▼ Falling</span>');
+});
+
+test("clock-core.css is well-formed: comments and braces balance (a stray */ silently drops the next rule)", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const css = await readFile(new URL("../clock-core.css", import.meta.url), "utf8");
+  const opens = css.split("/*").length - 1, closes = css.split("*/").length - 1;
+  assert.equal(closes, opens, "every /* needs exactly one */");
+  const code = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  assert.doesNotMatch(code, /\*\//, "a */ outside a comment");
+  let depth = 0;
+  for (const ch of code) { if (ch === "{") depth++; if (ch === "}") depth--; assert.ok(depth >= 0, "extra }"); }
+  assert.equal(depth, 0, "unclosed {");
 });
