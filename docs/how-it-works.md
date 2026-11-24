@@ -164,6 +164,40 @@ for each frame). `app.js` starts it with
 - **Errors** are logged once and hide the canvas; the clock keeps working. The smoke test fails if the canvas did not
   paint.
 
+## Languages
+
+Every clock speaks English, French, Spanish and Arabic. Arabic is written right to left.
+
+- **Choosing the language.** An inline script at the top of `index.html` picks it before anything is drawn: `?lang=`
+  in the address, then the visitor's last choice (`localStorage` "clock-lang"), then the browser's languages, then
+  English. It sets `<html lang dir>`, points the canonical address at that language, and hides the page
+  (`data-i18n="pending"`) until the translation is in, so nobody sees English flash by. The globe picker
+  (`addLangPicker`) saves the choice and reloads with `?lang=`, keeping the `#view`.
+- **Text in the page.** Visible text in `index.html` stays in English and carries a key: `data-i18n="key"` (the
+  element's HTML is replaced) or `data-i18n-attr="aria-label:key; title:key2"`. A translation keeps every element with
+  an `id` or a `data-` fill attribute that the English has, so the live numbers still land in it.
+- **Text from the code.** Code reads words with `C.t("key", { n: 3 })`. Each clock keeps them in `js/i18n/en.js`
+  (registered with `addStrings` in `messages.js`). Words that live in `config.js` (a gas's name) use
+  `C.tOr("gas.ch4.label", gas.label)`. Never compare translated text: compare keys (verdicts have `verdict.key`).
+- **Translations.** `js/i18n/fr.js`, `es.js`, `ar.js` hold every `en.js` key and every page key. They load on demand
+  (`startLanguage`), and `test/i18n.test.js` checks each has every key, the same `{placeholders}` and the same ids
+  and `data-` slots. Formulas may stay in their Latin symbols.
+- **Numbers and names.** `setLang` switches `fmt` and `pct` to the language (French `1 234,5`, Spanish `1.234,5`;
+  Arabic keeps Western digits so counters stay readable). `signed` isolates its sign in right-to-left text. Country
+  names come from the browser (`regionName(flagRegion(flag), englishName)`), so config.js needs no translations.
+- **Right to left.** clock-core.css uses start/end (logical) properties, so layouts mirror by themselves; numbers stay
+  left to right. In page code, position things with `style.insetInlineStart`, never `left`.
+- **Search engines.** Each page lists its languages with `<link rel="alternate" hreflang>` and the sitemap lists the
+  `?lang=` addresses.
+
+## Embeds: the clock on other websites
+
+`?embed=1` turns a clock into a small widget: the scene strip with the clock's name, the coloured answer and the live
+number, plus "Open the full clock". The inline script marks it (`<html data-embed>`) and clock-core.css hides the
+rest. `wireEmbed(footer)` adds "Put this clock on your website" to the full page: a dialog with the one-line
+`<iframe>` code (in the language and view on screen), a Copy button and a live preview. The smoke test checks the
+widget fits a 360 by 300 frame.
+
 ## Displaying numbers
 
 - Choose units so the main numbers visibly move (MWh not TWh, tonnes not gigatonnes, kW not GW).
@@ -177,7 +211,7 @@ for each frame). `app.js` starts it with
 | `npm run style` | No em or en dashes in any text file | every repository |
 | `npm run typecheck` | TypeScript checks the JSDoc types (`jsconfig.json`, strict) | every repository |
 | `npm test` | Unit tests for the pure functions | every repository |
-| `npm run smoke` | Serves the clock, opens it in Chromium at 1280 and 375 px, checks data loads, counters tick, verdicts show, the header picture paints, no sideways scroll, no dashes, no console errors | clocks |
+| `npm run smoke` | Serves the clock, opens it in Chromium at 1280 and 375 px, checks data loads, counters tick, verdicts show, the header picture paints, each language (Arabic right to left) and the widget, no sideways scroll, no dashes, no console errors | clocks |
 
 `CLOCK_CORE_DIR=../clock-core npm run smoke` serves clock-core from a local checkout instead of the CDN, to test a
 clock-core change before releasing it. The weekly scheduled run catches data sources that changed or went away.

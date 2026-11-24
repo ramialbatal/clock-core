@@ -111,6 +111,18 @@ numbers were wrong or a country was missing. Check this list before adding a dat
   emissions scene needed dense, dark plumes coming visibly out of chimneys and a dim sun behind brown haze.
 - Tiny dark figures in front of dark buildings were invisible. People in the jobs scene wear coloured clothes.
 
+### Translating without breaking the logic
+- The emissions page decided its headline by comparing the verdict's text with "Off track". Once verdicts were
+  translated, that comparison would have silently failed in every other language. Verdicts now carry a `key`, and
+  code compares keys, never words.
+- A local variable named `t` (time) hid the translate function `t` inside two functions. The type checker caught it;
+  name time variables `ty` or `now`.
+- Translated paragraphs can drop the element a live number is written into, and the page then fails quietly. The
+  i18n test compares each translation's ids and `data-` slots with the English, and the smoke test compares the ids on
+  the translated page.
+- Arabic numbers: the browser's default Arabic format uses Eastern Arabic digits, which made counters jump in width.
+  The Arabic locale is `ar-u-nu-latn` (Western digits), and a leading + or - is kept in front with isolation marks.
+
 ### Year rollover
 - `YEAR` is read once at page load. A tab open across New Year kept counting the old year. The ticker now reloads the
   page when the year changes.

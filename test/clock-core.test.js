@@ -4,7 +4,8 @@ import assert from "node:assert/strict";
 import {
   signed, pct, digits, escapeHtml, parseCsv, seriesByCode, namesByCode, num, shown, shownSign, project,
   interpolateMidYear, neededGrowth, verdict, sparkline, tYears, yearFraction, YEAR, fmt, once,
-  restOfWorld, changeClass, trendText, message, statusCard, badge, TONE_ICON, seeded
+  restOfWorld, changeClass, trendText, message, statusCard, badge, TONE_ICON, seeded,
+  LANGS, addStrings, t, tOr, hasText, setLang, lang, locale, isRtl, asLang, regionName, flagRegion
 } from "../clock-core.js";
 
 const close = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) < eps, `${a} is not close to ${b}`);
@@ -114,16 +115,16 @@ test("neededGrowth and verdict", () => {
   close(neededGrowth(100, 121, 2), 0.1);
   assert.equal(neededGrowth(1, 2, 0), Infinity);
   assert.equal(neededGrowth(12000, 11000, 0), 0);         // past the deadline, target met
-  assert.deepEqual(verdict(0.05, neededGrowth(12000, 11000, 0)), { cls: "ok", text: "On track" });
-  assert.deepEqual(verdict(0, 0.1), { cls: "bad", text: "Off track" });           // flat is not backwards
-  assert.deepEqual(verdict(-6, -5), { cls: "ok", text: "On track" });             // reduction goal, cutting faster
-  assert.deepEqual(verdict(-4.5, -5), { cls: "near", text: "Close" });
-  assert.deepEqual(verdict(-1, -31), { cls: "bad", text: "Off track" });
-  assert.deepEqual(verdict(2.8, -31), { cls: "bad", text: "Going backwards" });
-  assert.deepEqual(verdict(0.2, 0.16), { cls: "ok", text: "On track" });
-  assert.deepEqual(verdict(0.155, 0.164), { cls: "near", text: "Close" });
-  assert.deepEqual(verdict(0.05, 0.164), { cls: "bad", text: "Off track" });
-  assert.deepEqual(verdict(-0.01, 0.164), { cls: "bad", text: "Going backwards" });
+  assert.deepEqual(verdict(0.05, neededGrowth(12000, 11000, 0)), { cls: "ok", key: "onTrack", text: "On track" });
+  assert.deepEqual(verdict(0, 0.1), { cls: "bad", key: "offTrack", text: "Off track" });           // flat is not backwards
+  assert.deepEqual(verdict(-6, -5), { cls: "ok", key: "onTrack", text: "On track" });             // reduction goal, cutting faster
+  assert.deepEqual(verdict(-4.5, -5), { cls: "near", key: "close", text: "Close" });
+  assert.deepEqual(verdict(-1, -31), { cls: "bad", key: "offTrack", text: "Off track" });
+  assert.deepEqual(verdict(2.8, -31), { cls: "bad", key: "backwards", text: "Going backwards" });
+  assert.deepEqual(verdict(0.2, 0.16), { cls: "ok", key: "onTrack", text: "On track" });
+  assert.deepEqual(verdict(0.155, 0.164), { cls: "near", key: "close", text: "Close" });
+  assert.deepEqual(verdict(0.05, 0.164), { cls: "bad", key: "offTrack", text: "Off track" });
+  assert.deepEqual(verdict(-0.01, 0.164), { cls: "bad", key: "backwards", text: "Going backwards" });
 });
 
 test("sparkline: a change displayed as zero stays neutral; points are placed by year; label for screen readers", () => {
@@ -209,4 +210,85 @@ test("seeded: the same seed gives the same numbers, all in [0, 1)", () => {
   assert.ok(xs.every((x) => x >= 0 && x < 1));
   const mean = xs.reduce((s, x) => s + x, 0) / xs.length;
   assert.ok(Math.abs(mean - 0.5) < 0.05, `mean ${mean}`);
+});
+
+test("languages: t() fills placeholders and falls back to English, then to the key", () => {
+  addStrings("en", { "test.hi": "Hello {name}, {n} new" });
+  addStrings("fr", { "test.hi": "Bonjour {name}, {n} nouveaux" });
+  try {
+    assert.equal(t("test.hi", { name: "Ana", n: 3 }), "Hello Ana, 3 new");
+    setLang("fr");
+    assert.equal(lang(), "fr");
+    assert.equal(t("test.hi", { name: "Ana", n: 3 }), "Bonjour Ana, 3 nouveaux");
+    assert.equal(t("core.showAll", { n: 12 }), "Voir les 12 pays");
+    assert.ok(hasText("test.hi"));
+    setLang("es");
+    assert.equal(t("test.hi", { name: "Ana" }), "Hello Ana, {n} new");   // no Spanish yet: English, unknown {n} kept
+    assert.ok(!hasText("test.hi"));
+    assert.equal(t("no.such.key"), "no.such.key");
+    setLang("xx");
+    assert.equal(lang(), "en");
+    assert.equal(asLang("ar"), "ar");
+    assert.equal(asLang(null), "en");
+  } finally { setLang("en"); }
+});
+
+test("languages: numbers, percentages, signs and verdicts follow the language", () => {
+  try {
+    assert.equal(fmt[1].format(1234.56), "1,234.6");
+    setLang("fr");
+    assert.equal(fmt[1].format(1234.56), "1 234,6");
+    assert.equal(pct(4.86), "4,9 %");
+    assert.equal(verdict(0.1, 0.1).text, "Sur la bonne voie");
+    setLang("es");
+    assert.equal(fmt[0].format(12345), "12.345");
+    assert.equal(locale(), "es-ES");
+    setLang("ar");
+    assert.ok(isRtl());
+    assert.equal(fmt[0].format(12345), "12,345");                        // Western digits in Arabic
+    assert.equal(signed(5), "⁦+5⁩");                          // isolated so the sign stays in front
+    assert.equal(verdict(-0.1, 0.1).text, "يتراجع");
+  } finally { setLang("en"); }
+  assert.equal(signed(5), "+5");
+  assert.equal(pct(4.86), "4.9%");
+});
+
+test("languages: every language has clock-core's strings, with the same placeholders", () => {
+  const keys = (code) => { setLang(code); return Object.keys(LANGS).length && ["core.onTrack", "core.close", "core.offTrack",
+    "core.backwards", "core.showYearly", "core.yearly", "core.hideYearly", "core.showAll", "core.error", "core.language",
+    "core.close.button", "core.embed.button", "core.embed.title", "core.embed.text", "core.embed.copy", "core.embed.copied",
+    "core.embed.preview", "core.embed.credit"]; };
+  try {
+    for (const code of Object.keys(LANGS)) {
+      for (const k of keys(code)) {
+        assert.ok(hasText(k), `${code} lacks ${k}`);
+        setLang("en"); const en = (t(k).match(/\{\w+\}/g) ?? []).sort().join();
+        setLang(code); assert.equal((t(k).match(/\{\w+\}/g) ?? []).sort().join(), en, `${code} ${k} placeholders`);
+      }
+    }
+  } finally { setLang("en"); }
+});
+
+test("regionName uses the browser's translations, English stays as given", () => {
+  try {
+    assert.equal(regionName("FR", "France"), "France");
+    setLang("es");
+    assert.equal(regionName("US", "United States"), "Estados Unidos");
+    assert.equal(regionName(undefined, "Rest of world"), "Rest of world");
+    setLang("fr");
+    assert.equal(regionName("001", "World"), "Monde");
+  } finally { setLang("en"); }
+});
+
+test("flagRegion reads the region code inside a flag; tOr prefers the current language's text", () => {
+  assert.equal(flagRegion("🇫🇷"), "FR");
+  assert.equal(flagRegion("🇪🇺"), "EU");
+  assert.equal(flagRegion("🌐"), "");
+  addStrings("fr", { "test.gas": "Méthane" });
+  try {
+    assert.equal(tOr("test.gas", "Methane"), "Methane");
+    setLang("fr");
+    assert.equal(tOr("test.gas", "Methane"), "Méthane");
+    assert.equal(tOr("test.none", "Methane"), "Methane");
+  } finally { setLang("en"); }
 });

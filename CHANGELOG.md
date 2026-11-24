@@ -4,6 +4,19 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
+## v1.5.0 (2026-11)
+
+Every clock in four languages, and as a widget for other websites.
+
+- Languages: `LANGS`, `lang`, `locale`, `isRtl`, `asLang`, `addStrings`, `t`, `tOr`, `hasText`, `setLang`,
+  `regionName`, `flagRegion`, `translatePage`, `addLangPicker`, `startLanguage`. English, French, Spanish and Arabic
+  (right to left). `fmt` and `pct` follow the language; `signed` keeps its sign in front in right-to-left text.
+  clock-core's own words (verdicts, "Show all", "Yearly data", errors) are translated.
+- `verdict()` results now also carry a `key` ("onTrack", "close", "offTrack", "backwards"): compare that, not the text.
+- Embeds: `isEmbed`, `clockUrl`, `wireEmbed` (the "Put this clock on your website" dialog, and the widget's link back).
+- CSS: logical (start/end) properties throughout so pages mirror in Arabic; the globe picker; the embed dialog; the
+  widget layout (`html[data-embed]`); pages stay hidden while `html[data-i18n="pending"]`.
+
 ## v1.4.0 (2026-11)
 
 Scenes: an animated picture behind the top of each clock, so the page shows what it is about at a glance.

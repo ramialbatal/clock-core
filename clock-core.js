@@ -7,7 +7,7 @@
  *   import * as C from "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@<commit-or-tag>/clock-core.js";
  * (each clock maps the bare name "clock-core" to that URL with an import map).
  *
- * Sections: Time · Formatting · Data · Models · Rendering · Ticker · Scene · Page.
+ * Sections: Time · Languages · Formatting · Data · Models · Rendering · Ticker · Scene · Page (incl. embeds).
  * Pure functions (everything up to Rendering, plus `seeded`) also run in Node and are unit tested in
  * test/clock-core.test.js. The DOM helpers (Rendering, Ticker, Scene, Page) need a browser.
  */
@@ -28,8 +28,9 @@
  */
 
 /**
- * A goal verdict. `cls` drives the badge colour: ok (green), near (amber), bad (red), "" (neutral).
- * @typedef {{ cls: "ok" | "near" | "bad" | "", text: string }} Verdict
+ * A goal verdict. `cls` drives the badge colour: ok (green), near (amber), bad (red), "" (neutral). `key` names the
+ * verdict whatever the language (compare with it, not with the translated `text`).
+ * @typedef {{ cls: "ok" | "near" | "bad" | "", key: "onTrack" | "close" | "offTrack" | "backwards" | "", text: string }} Verdict
  */
 
 /**
@@ -65,13 +66,152 @@ export function tYears(ms = Date.now()) {
   return y + (ms - yearStart(y)) / msPerYear(y);
 }
 
+// ---- Languages ---------------------------------------------------------------------
+// The page's inline script picks the language before the first paint and sets <html lang dir> (see
+// docs/how-it-works.md, "Languages"). Clocks register their strings with addStrings, call setLang(pageLang()),
+// then translatePage(). Pure parts (t, setLang, number formats) also run in Node.
+
+/** @typedef {"en" | "fr" | "es" | "ar"} Lang */
+
+/** Supported languages, by code, with their own names (as shown in the language picker). */
+export const LANGS = /** @type {const} */ ({ en: "English", fr: "Français", es: "Español", ar: "العربية" });
+/** Languages written right to left. */
+export const RTL_LANGS = /** @type {readonly Lang[]} */ (["ar"]);
+// Locales for numbers and dates. Arabic keeps Western digits so live counters stay easy to read.
+const LOCALES = /** @type {Record<Lang, string>} */ ({ en: "en-US", fr: "fr-FR", es: "es-ES", ar: "ar-u-nu-latn" });
+
+/** @type {Lang} */
+let current = "en";
+/** The current language code. */
+export const lang = () => current;
+/** The current locale, for Intl and toLocaleString, e.g. "fr-FR". */
+export const locale = () => LOCALES[current];
+/** True when the current language is written right to left. */
+export const isRtl = () => RTL_LANGS.includes(current);
+/**
+ * A supported language code, or "en".
+ * @param {unknown} code
+ * @returns {Lang}
+ */
+export const asLang = (code) => (typeof code === "string" && Object.hasOwn(LANGS, code) ? /** @type {Lang} */ (code) : "en");
+
+/** clock-core's own words, in every language. Clocks add theirs with addStrings. */
+/** @type {Record<Lang, Record<string, string>>} */
+const STRINGS = {
+  en: {
+    "core.onTrack": "On track", "core.close": "Close", "core.offTrack": "Off track", "core.backwards": "Going backwards",
+    "core.showYearly": "Show yearly values", "core.yearly": "Yearly data", "core.hideYearly": "Hide yearly data",
+    "core.showAll": "Show all {n} countries", "core.error": "Something went wrong while loading the data.",
+    "core.language": "Language", "core.close.button": "Close",
+    "core.embed.button": "Put this clock on your website", "core.embed.title": "Put this clock on your website",
+    "core.embed.text": "Copy this code into your page. The clock keeps itself up to date, in the language and view you have open now.",
+    "core.embed.copy": "Copy code", "core.embed.copied": "Copied", "core.embed.preview": "Preview",
+    "core.embed.credit": "Open the full clock",
+  },
+  fr: {
+    "core.onTrack": "Sur la bonne voie", "core.close": "Presque", "core.offTrack": "Pas assez vite", "core.backwards": "En recul",
+    "core.showYearly": "Voir les valeurs annuelles", "core.yearly": "Données annuelles", "core.hideYearly": "Masquer les données annuelles",
+    "core.showAll": "Voir les {n} pays", "core.error": "Un problème est survenu pendant le chargement des données.",
+    "core.language": "Langue", "core.close.button": "Fermer",
+    "core.embed.button": "Mettre cette horloge sur votre site", "core.embed.title": "Mettre cette horloge sur votre site",
+    "core.embed.text": "Copiez ce code dans votre page. L'horloge se met à jour toute seule, dans la langue et la vue ouvertes en ce moment.",
+    "core.embed.copy": "Copier le code", "core.embed.copied": "Copié", "core.embed.preview": "Aperçu",
+    "core.embed.credit": "Ouvrir l'horloge complète",
+  },
+  es: {
+    "core.onTrack": "Va bien", "core.close": "Cerca", "core.offTrack": "Demasiado lento", "core.backwards": "Va hacia atrás",
+    "core.showYearly": "Ver los valores anuales", "core.yearly": "Datos anuales", "core.hideYearly": "Ocultar los datos anuales",
+    "core.showAll": "Ver los {n} países", "core.error": "Algo salió mal al cargar los datos.",
+    "core.language": "Idioma", "core.close.button": "Cerrar",
+    "core.embed.button": "Pon este reloj en tu web", "core.embed.title": "Pon este reloj en tu web",
+    "core.embed.text": "Copia este código en tu página. El reloj se actualiza solo, en el idioma y la vista que tienes abiertos ahora.",
+    "core.embed.copy": "Copiar código", "core.embed.copied": "Copiado", "core.embed.preview": "Vista previa",
+    "core.embed.credit": "Abrir el reloj completo",
+  },
+  ar: {
+    "core.onTrack": "على المسار الصحيح", "core.close": "قريب", "core.offTrack": "أبطأ من اللازم", "core.backwards": "يتراجع",
+    "core.showYearly": "عرض القيم السنوية", "core.yearly": "البيانات السنوية", "core.hideYearly": "إخفاء البيانات السنوية",
+    "core.showAll": "عرض كل البلدان ({n})", "core.error": "حدث خطأ أثناء تحميل البيانات.",
+    "core.language": "اللغة", "core.close.button": "إغلاق",
+    "core.embed.button": "ضع هذه الساعة على موقعك", "core.embed.title": "ضع هذه الساعة على موقعك",
+    "core.embed.text": "انسخ هذا الرمز إلى صفحتك. تتحدّث الساعة تلقائيًا، باللغة والعرض المفتوحين الآن.",
+    "core.embed.copy": "نسخ الرمز", "core.embed.copied": "تم النسخ", "core.embed.preview": "معاينة",
+    "core.embed.credit": "افتح الساعة كاملة",
+  },
+};
+
+/**
+ * Add a clock's strings for one language (later calls override earlier ones).
+ * @param {Lang} code
+ * @param {Record<string, string>} table
+ */
+export function addStrings(code, table) { STRINGS[code] = { ...STRINGS[code], ...table }; }
+
+/**
+ * The text for a key in the current language, falling back to English and then to the key itself.
+ * `{name}` placeholders are filled from vars: t("core.showAll", { n: 12 }).
+ * @param {string} key
+ * @param {Record<string, string | number>} [vars]
+ */
+export function t(key, vars) {
+  const s = STRINGS[current][key] ?? STRINGS.en[key] ?? key;
+  return vars ? s.replace(/\{(\w+)\}/g, (m, k) => (Object.hasOwn(vars, k) ? String(vars[k]) : m)) : s;
+}
+
+/**
+ * The current language's text for a key if it has one, else `english` (for words kept in config.js, such as a
+ * gas's name: tOr("gas.ch4.label", gas.label)).
+ * @param {string} key
+ * @param {string} english
+ */
+export const tOr = (key, english) => (Object.hasOwn(STRINGS[current], key) ? t(key) : english);
+
+/**
+ * The two-letter region code inside a flag emoji: "🇫🇷" gives "FR", "🇪🇺" gives "EU"; "" for anything else.
+ * @param {string} flag
+ */
+export function flagRegion(flag) {
+  const cps = [...flag].map((c) => /** @type {number} */ (c.codePointAt(0)) - 0x1f1e6);
+  return cps.length === 2 && cps.every((n) => n >= 0 && n < 26) ? String.fromCharCode(...cps.map((n) => n + 65)) : "";
+}
+
+/**
+ * True when the current language has its own text for a key (not the English fallback).
+ * @param {string} key
+ */
+export const hasText = (key) => Object.hasOwn(STRINGS[current], key);
+
+/**
+ * Switch language: number formats follow it at once. Unknown codes fall back to English.
+ * @param {unknown} code
+ */
+export function setLang(code) {
+  current = asLang(code);
+  for (const d of /** @type {const} */ ([0, 1, 2, 3])) fmt[d] = nf(d);
+}
+
+/**
+ * A place's name in the current language, from a two-letter region code ("FR", "EU", or "001" for the world),
+ * using the browser's own translations; `fallback` when the browser has none.
+ * @param {string | undefined} region
+ * @param {string} fallback
+ */
+export function regionName(region, fallback) {
+  if (!region || current === "en") return fallback;
+  try { return new Intl.DisplayNames([locale()], { type: "region" }).of(region) ?? fallback; } catch { return fallback; }
+}
+
 // ---- Formatting --------------------------------------------------------------
 
 /** @param {number} d */
-const nf = (d) => new Intl.NumberFormat("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const nf = (d) => new Intl.NumberFormat(locale(), { minimumFractionDigits: d, maximumFractionDigits: d });
 
-/** Number formats with 0 to 3 decimals, e.g. fmt[1].format(4.25) === "4.3". */
-export const fmt = /** @type {const} */ ({ 0: nf(0), 1: nf(1), 2: nf(2), 3: nf(3) });
+/**
+ * Number formats with 0 to 3 decimals in the current language, e.g. fmt[1].format(4.25) is "4.3" in English and
+ * "4,3" in French. setLang replaces them, so always read them from here (don't keep your own copy).
+ * @type {Record<0 | 1 | 2 | 3, Intl.NumberFormat>}
+ */
+export const fmt = { 0: nf(0), 1: nf(1), 2: nf(2), 3: nf(3) };
 
 /**
  * A value rounded the way it will be displayed with `d` decimals. Compare and colour with this,
@@ -92,20 +232,23 @@ export function shown(x, d = 0) {
 export const shownSign = (x, d = 0) => Math.sign(shown(x, d));
 
 /**
- * "+1,234" or "-1,234" (plain hyphen). No sign when the value rounds to zero.
+ * "+1,234" or "-1,234" (plain hyphen). No sign when the value rounds to zero. In right-to-left languages the result
+ * is wrapped in invisible isolation marks so the sign stays in front.
  * @param {number} x
  * @param {Intl.NumberFormat} [f]
  */
 export function signed(x, f = fmt[0]) {
   const s = f.format(Math.abs(x));
-  return (/[1-9]/.test(s) ? (x > 0 ? "+" : "-") : "") + s;
+  const out = (/[1-9]/.test(s) ? (x > 0 ? "+" : "-") : "") + s;
+  return isRtl() ? `\u2066${out}\u2069` : out;   // keep the sign in front inside right-to-left text
 }
 
 /**
+ * "4.9%" (French: "4,9 %", with a narrow no-break space).
  * @param {number} x  Percentage value (4.9 means 4.9%).
  * @param {0|1|2|3} [d]
  */
-export const pct = (x, d = 1) => fmt[d].format(x) + "%";
+export const pct = (x, d = 1) => fmt[d].format(x) + (current === "fr" ? "\u202f%" : "%");
 
 /**
  * Wrap each digit in a span so big counters don't jitter as digits change width.
@@ -298,10 +441,10 @@ export function neededGrowth(from, to, years) {
 export function verdict(actual, needed, nearBand = 0.85) {
   const dir = needed < 0 ? -1 : 1;          // which way the goal wants things to move
   const a = actual * dir, n = needed * dir;  // flip a reduction goal into a rising one
-  if (a >= n) return { cls: "ok", text: "On track" };
-  if (a < 0) return { cls: "bad", text: "Going backwards" };
-  if (a >= n * nearBand && a > 0) return { cls: "near", text: "Close" };
-  return { cls: "bad", text: "Off track" };
+  if (a >= n) return { cls: "ok", key: "onTrack", text: t("core.onTrack") };
+  if (a < 0) return { cls: "bad", key: "backwards", text: t("core.backwards") };
+  if (a >= n * nearBand && a > 0) return { cls: "near", key: "close", text: t("core.close") };
+  return { cls: "bad", key: "offTrack", text: t("core.offTrack") };
 }
 
 /**
@@ -368,7 +511,7 @@ export const message = (tone, title, text) => ({ tone, icon: TONE_ICON[tone], ti
  * @param {{ caption?: string, change?: number | null, changeText?: string, good?: "up" | "down",
  *   title?: string, label?: string }} [opts]  `label` is read by screen readers, e.g. "Annual emissions 2015 to 2025, +35%".
  */
-export function sparkline(years, values, { caption = "", change = null, changeText = "", good = "up", title = "Show yearly values", label = "" } = {}) {
+export function sparkline(years, values, { caption = "", change = null, changeText = "", good = "up", title = t("core.showYearly"), label = "" } = {}) {
   if (values.length < 2) return "";
   const min = Math.min(...values), max = Math.max(...values), span = max - min || 1;
   const W = 120, H = 28, y0 = years[0], yspan = years[years.length - 1] - y0 || 1;
@@ -431,7 +574,7 @@ export function showAnswer(m) {
  * @param {number} total   number of cards
  */
 export function wireShowAll(grid, button, total) {
-  button.textContent = `Show all ${total} countries`;
+  button.textContent = t("core.showAll", { n: total });
   button.hidden = !grid.classList.contains("collapsed") || total <= 6;
   button.onclick = () => { grid.classList.remove("collapsed"); button.hidden = true; };
 }
@@ -446,7 +589,7 @@ export function wireHistory(card) {
   const toggle = () => {
     h.hidden = !h.hidden;
     btn.setAttribute("aria-expanded", String(!h.hidden));
-    if (btn.firstChild) btn.firstChild.textContent = h.hidden ? "Yearly data " : "Hide yearly data ";
+    if (btn.firstChild) btn.firstChild.textContent = `${t(h.hidden ? "core.yearly" : "core.hideYearly")} `;
     btn.classList.toggle("open", !h.hidden);
   };
   btn.addEventListener("click", toggle);
@@ -618,6 +761,152 @@ export function startScene(canvas, scene, { groundAt = null, fps = 30, stillAt =
   return { stop, redraw: () => { if (!raf) { f.dt = 0; paint(); } } };
 }
 
+// ---- Languages on the page ----------------------------------------------------------
+
+/**
+ * Translate the page into the current language: every element with data-i18n="key" gets that key's text (as HTML,
+ * so keep any inner elements with ids or data- attributes in the translation), and data-i18n-attr="attr:key; ..."
+ * sets attributes (aria-label, content, title...). Keys the language lacks keep the English already in the page.
+ * Also sets <html lang dir> and shows the page if the inline script hid it while waiting.
+ */
+export function translatePage() {
+  const root = document.documentElement;
+  if (current !== "en") {
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = /** @type {HTMLElement} */ (el).dataset.i18n;
+      if (key && hasText(key)) el.innerHTML = t(key);
+    });
+    document.querySelectorAll("[data-i18n-attr]").forEach((el) => {
+      for (const pair of (/** @type {HTMLElement} */ (el).dataset.i18nAttr ?? "").split(";")) {
+        const [attr, key] = pair.split(":").map((x) => x.trim());
+        if (attr && key && hasText(key)) el.setAttribute(attr, t(key));
+      }
+    });
+  }
+  root.lang = current;
+  root.dir = isRtl() ? "rtl" : "ltr";
+  delete root.dataset.i18n;
+}
+
+/**
+ * Add the language picker (a globe and the language code; tapping it opens the device's own list) at the start of
+ * `where`. Choosing a language remembers it and reloads the page in that language, keeping the view (#hash).
+ * @param {Element | null} where  usually the header's .wrap
+ */
+export function addLangPicker(where) {
+  if (!where || isEmbed()) return;
+  const label = document.createElement("label");
+  label.className = "lang-pick";
+  label.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8">
+      <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z"/></svg>
+    <span class="lang-code" aria-hidden="true">${current.toUpperCase()}</span>
+    <select aria-label="${escapeHtml(t("core.language"))}">${Object.entries(LANGS)
+      .map(([c, name]) => `<option value="${c}" lang="${c}"${c === current ? " selected" : ""}>${name}</option>`).join("")}</select>`;
+  const select = /** @type {HTMLSelectElement} */ (label.querySelector("select"));
+  select.addEventListener("change", () => {
+    const code = asLang(select.value);
+    try { localStorage.setItem("clock-lang", code); } catch { /* private mode: the URL still carries it */ }
+    const url = new URL(location.href);
+    if (code === "en") url.searchParams.delete("lang"); else url.searchParams.set("lang", code);
+    location.assign(url.href);
+  });
+  where.prepend(label);
+}
+
+/**
+ * Start the page in the language the inline script chose: load that language's strings (English must already be
+ * added), switch number formats, translate the page and add the picker. If the strings can't load, the page stays
+ * in English.
+ * @param {(code: Lang) => Promise<{ default: Record<string, string> }>} load  e.g. (c) => import(`./i18n/${c}.js`)
+ * @param {Element | null} pickerIn  where the language picker goes (usually the header's .wrap)
+ */
+export async function startLanguage(load, pickerIn) {
+  let code = asLang(document.documentElement.lang);
+  if (code !== "en") {
+    try { addStrings(code, (await load(code)).default); } catch (err) { console.error("Language:", err); code = "en"; }
+  }
+  setLang(code);
+  translatePage();
+  addLangPicker(pickerIn);
+}
+
+// ---- Embeds: the clock as a small widget on other websites ------------------------------
+
+/** True when the page runs as a widget (?embed=1; the inline script sets <html data-embed>). */
+export const isEmbed = () => document.documentElement.hasAttribute("data-embed");
+
+/**
+ * The clock's address in a given form: the full page, or the widget, keeping the language and the view (#hash).
+ * @param {{ embed?: boolean }} [opts]
+ */
+export function clockUrl({ embed = false } = {}) {
+  const url = new URL(location.origin + location.pathname);
+  if (embed) url.searchParams.set("embed", "1");
+  if (current !== "en") url.searchParams.set("lang", current);
+  return url.href + location.hash;
+}
+
+/**
+ * Set the page up for its two roles. As a widget: links open in a new tab and a small "Open the full clock" link is
+ * added at the bottom. As the full page: adds the "Put this clock on your website" button to `where` (the footer),
+ * which opens a dialog with the code to copy and a live preview.
+ * @param {Element | null} where
+ */
+export function wireEmbed(where) {
+  if (isEmbed()) {
+    const credit = document.createElement("a");
+    credit.className = "embed-credit";
+    credit.textContent = `${t("core.embed.credit")} ${isRtl() ? "↖" : "↗"}`;
+    document.body.append(credit);
+    const point = () => { credit.href = clockUrl(); };
+    point(); window.addEventListener("hashchange", point);
+    document.querySelectorAll("a").forEach((a) => { a.target = "_blank"; a.rel = "noopener"; });
+    return;
+  }
+  if (!where) return;
+  const open = document.createElement("button");
+  open.type = "button";
+  open.className = "embed-open";
+  open.innerHTML = `<span aria-hidden="true">&lt;/&gt;</span> ${escapeHtml(t("core.embed.button"))}`;
+  where.prepend(open);
+  /** @type {HTMLDialogElement | null} */
+  let dlg = null;
+  open.addEventListener("click", () => {
+    if (!dlg) {
+      dlg = document.createElement("dialog");
+      dlg.id = "embed";
+      dlg.setAttribute("aria-labelledby", "embed-title");
+      dlg.innerHTML = `<header class="sheet-head"><h2 id="embed-title">${escapeHtml(t("core.embed.title"))}</h2>
+          <button type="button" class="close" aria-label="${escapeHtml(t("core.close.button"))}">×</button></header>
+        <div class="sheet">
+          <p>${escapeHtml(t("core.embed.text"))}</p>
+          <textarea class="embed-code" readonly rows="4" dir="ltr" spellcheck="false"></textarea>
+          <button type="button" class="embed-copy">${escapeHtml(t("core.embed.copy"))}</button>
+          <p class="embed-label">${escapeHtml(t("core.embed.preview"))}</p>
+          <iframe class="embed-preview" title="${escapeHtml(t("core.embed.preview"))}" loading="lazy"></iframe>
+        </div>`;
+      document.body.append(dlg);
+      const d = dlg;
+      d.querySelector(".close")?.addEventListener("click", () => d.close());
+      d.addEventListener("click", (e) => { if (e.target === d) d.close(); });
+      const copy = /** @type {HTMLButtonElement} */ (d.querySelector(".embed-copy"));
+      copy.addEventListener("click", async () => {
+        const code = /** @type {HTMLTextAreaElement} */ (d.querySelector(".embed-code"));
+        try { await navigator.clipboard.writeText(code.value); } catch { code.select(); document.execCommand?.("copy"); }
+        copy.textContent = t("core.embed.copied");
+        setTimeout(() => { copy.textContent = t("core.embed.copy"); }, 2000);
+      });
+    }
+    const src = clockUrl({ embed: true });
+    const name = escapeHtml(document.querySelector("h1")?.textContent?.trim() ?? "");
+    /** @type {HTMLTextAreaElement} */ (dlg.querySelector(".embed-code")).value =
+      `<iframe src="${escapeHtml(src)}" title="${name}" width="100%" height="300" style="border:0;max-width:480px;border-radius:16px" loading="lazy"></iframe>`;
+    const preview = /** @type {HTMLIFrameElement} */ (dlg.querySelector(".embed-preview"));
+    if (preview.src !== src) preview.src = src;
+    dlg.showModal();
+  });
+}
+
 // ---- Page chrome -------------------------------------------------------------------
 
 /**
@@ -628,7 +917,7 @@ export function startScene(canvas, scene, { groundAt = null, fps = 30, stillAt =
 export function setState(state, msg) {
   document.body.dataset.state = state;
   const box = document.getElementById("error-msg");
-  if (state === "error" && box) box.textContent = msg || "Something went wrong while loading the data.";
+  if (state === "error" && box) box.textContent = msg || t("core.error");
 }
 
 /** Wire the "?" explainer dialog (#help) to its open and close buttons. */
