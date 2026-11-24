@@ -38,8 +38,8 @@ The clocks currently pin clock-core v1.0.0 by its commit (`@7f64264…`), becaus
 with a capital V and jsDelivr treats tag names as case-sensitive. A tag or a commit both work; a commit never moves.
 
 The import map lets every module write `import * as C from "clock-core"`. In Node (tests, type checking) the same
-name resolves to the `clock-core` dev dependency, installed from the same release tag. To upgrade clock-core, change
-the version in both URLs and in `package.json`.
+name resolves to the `clock-core` dev dependency in `package.json`, pinned to the same commit. To upgrade clock-core,
+change the pin in all three places (two URLs, one dev dependency) and check the CDN URL returns 200.
 
 1. The body starts with `data-state="loading"`; CSS shows only `.loading-only` content.
 2. `app.js` starts the fetches. Each loader is wrapped in `C.once()`: it runs once and is reused, and a failure clears

@@ -24,9 +24,8 @@ The same checks run on every pull request.
 
 ## Releasing
 
-1. Update `CHANGELOG.md` and the `version` in `package.json` in your pull request.
-2. After merging, create a GitHub release with a tag like `v1.1.0`.
-3. In each clock, bump the version in its two `clock-core@vX.Y.Z` URLs in `index.html` and in `package.json`.
+See [README.md](README.md#release): changelog and version in the pull request, smoke-test a clock against your checkout,
+then bump each clock's pin in three places (two URLs in `index.html`, one in `package.json`).
 
 More detail in the [developer notes](docs/README.md).
 
