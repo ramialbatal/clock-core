@@ -131,7 +131,8 @@ Every clock is written for a visitor who is not technical and reads quickly (thi
 0. **The scene** (`canvas.scene` behind `header.top`): an animated picture that shows the topic before a word is
    read: smoke over chimneys for emissions, a sun, turbines and green hills for renewables, a town starting its working
    day for jobs. See [Scenes](#scenes-the-picture-behind-the-header).
-1. **The answer** (`section.answer`, filled by `C.showAnswer`): an icon, a short title and one sentence, in a colour:
+1. **The answer** (`section.answer`, filled by `C.showAnswer`): a coloured dot on the same line as a short title, and
+   one or two sentences (phones show only the first, so the live number fits on the first screen), in a colour:
    green (good), amber (warning) or red (bad). For example 🔴 "We're heading the wrong way".
 2. **The live counter** (`section.hero`), with one human-scale line ("about 1,248 more every second").
 3. **Where we stand** (`section.standing`): two or three traffic-light cards from `C.statusCard`, each one short
