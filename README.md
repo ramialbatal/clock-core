@@ -40,7 +40,7 @@ The clock then sets its colours in its own `css/theme.css`: `--accent`, `--accen
 | Group | Exports | Notes |
 |---|---|---|
 | Time (UTC) | `YEAR`, `yearStart`, `msPerYear`, `SEC_PER_YEAR`, `yearFraction`, `tYears` | `tYears` gives fractional years, e.g. 2026.89 |
-| Formats | `fmt[0..3]`, `shown`, `shownSign`, `signed`, `pct`, `digits`, `escapeHtml` | Compare and colour with `shown` (value as displayed); `signed` never shows "-0"; escape any data text put into HTML |
+| Formats | `fmt[0..3]`, `shown`, `shownSign`, `signed`, `signedPct`, `pct`, `digits`, `escapeHtml` | Compare and colour with `shown` (value as displayed); `signed` never shows "-0"; escape any data text put into HTML |
 | Data | `fetchText`, `fetchCsv`, `fetchJson`, `parseCsv`, `num`, `seriesByCode`, `namesByCode`, `once` | Strict parsing (bad cells are skipped, not misread); `once` caches a loader and retries after a failure |
 | Models | `project`, `interpolateMidYear`, `neededGrowth`, `verdict`, `restOfWorld` | Pure functions, unit tested; `verdict` works for rising and falling goals ("Close" = at least 85% of the needed pace) |
 | Rendering | `sparkline`, `changeClass`, `trendText`, `wireHistory`, `sortInto`, `showVerdict` | Colours follow which direction is good, as displayed |

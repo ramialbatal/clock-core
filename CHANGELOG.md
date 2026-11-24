@@ -4,7 +4,17 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
-## v1.5.0 (2026-11)
+## v1.6.0 (2026-11)
+
+Translation review by language: plainer, more natural French, Spanish and Arabic.
+
+- New: `signedPct` ("+2.8%", "+2,8 %" in French), used for every signed percentage so French spacing is consistent.
+- `pct` is isolated in right-to-left text, so percentages always read the same way in Arabic.
+- `trendText` translates "n/a" (new key `core.na`).
+- Reviewed wording of clock-core's own French, Spanish and Arabic strings (for example French "Dans le mauvais sens",
+  Spanish "Casi", Arabic "عرض كل الدول").
+
+## v1.5.0 (2026-11), commit `36b7aea`
 
 Every clock in four languages, and as a widget for other websites.
 
