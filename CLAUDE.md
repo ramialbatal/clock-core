@@ -6,7 +6,8 @@
 - No runtime dependencies, no build step. Every export has JSDoc types; keep `npm run typecheck` clean.
 - Add a unit test in `test/clock-core.test.js` for every change to a pure function.
 - Changing or removing an export or CSS class is a breaking change (new major version). Update `CHANGELOG.md` and
-  `package.json` `version` with every change.
+  `package.json` `version` with every code change (docs-only changes don't need a version).
+- Colour and verdict logic must compare values as displayed: use `shown` / `shownSign`, never the raw number.
 - Before finishing: `npm run check`, and run a clock's smoke test against this checkout
   (`CLOCK_CORE_DIR=../clock-core npm run smoke` in the clock's folder).
 - Writing style: no em dashes or en dashes anywhere (text, comments, images). Professional but approachable.
