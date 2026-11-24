@@ -4,7 +4,15 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
-## v1.7.0 (2026-11)
+## v1.8.0 (2026-11)
+
+- "What can I do?": `wireActions` and the `Action` type: a small button under the answer opens three sourced actions.
+- Visit counts: `startStats` and `track` (GoatCounter: no cookies, no personal data; never on localhost or in tests).
+- Share card mode (`?embed=1&card=1`, `<html data-card>`): the widget laid out for a 1200 by 630 link preview, with the
+  clock's address. Clocks refresh their preview picture weekly with it.
+- New strings: `core.act.*`, `core.done`, `core.stats`.
+
+## v1.7.0 (2026-11), commit `cff672a`
 
 - "Add to your site" moves from the bottom of the page to the top: a small pill next to the language picker, in a
   shared `.top-tools` row (top corner on wide screens, its own row on phones). New string `core.embed.short`.

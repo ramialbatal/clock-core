@@ -47,6 +47,7 @@ The clock then sets its colours in its own `css/theme.css`: `--accent`, `--accen
 | Messages | `message`, `TONE_ICON`, `showAnswer`, `statusCard`, `badge`, `wireShowAll` | The plain-language layout: answer banner, traffic-light cards, badges, short lists |
 | Ticker | `startTicker`, `stopTicker`, `setText` | About 10 redraws a second, writes only changed text, survives errors, reloads at New Year |
 | Languages | `startLanguage`, `t`, `tOr`, `addStrings`, `setLang`, `lang`, `locale`, `isRtl`, `regionName`, `flagRegion`, `translatePage`, `addLangPicker`, `LANGS` | English, French, Spanish, Arabic (right to left); numbers follow the language; country names come from the browser |
+| Actions and counts | `wireActions`, `startStats`, `track` | "What can I do?" sheet; anonymous visit counts with GoatCounter (no cookies) |
 | Embeds | `wireEmbed`, `isEmbed`, `clockUrl` | The clock as a small widget for other websites (`?embed=1`), and the "Put this clock on your website" dialog |
 | Scene | `startScene`, `seeded` | Runs the animated picture behind the header: sharp on any screen, pauses off screen, a still frame for "reduce motion" |
 | Page | `setState`, `wireHelp`, `fill`, `showVerdict` | Loading, ready and error states; the "?" pop-up; verdict badges |
