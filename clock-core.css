@@ -53,7 +53,7 @@ a { color: var(--accent-2); }
 
 .bar-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
 .bar-head h2 { margin: 0; }
-select { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font: inherit; margin-left: 6px; }
+select { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font: inherit; margin-inline-start: 6px; }
 
 .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
@@ -61,7 +61,7 @@ select { background: var(--panel); color: var(--text); border: 1px solid var(--l
 .card header { display: flex; align-items: center; gap: 10px; }
 .card h3 { margin: 0; font-size: 1.1rem; }
 .flag { font-size: 1.6rem; line-height: 1; }
-.tag { margin-left: auto; font-size: .72rem; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 1px 8px; }
+.tag { margin-inline-start: auto; font-size: .72rem; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 1px 8px; }
 .ytd { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 1.45rem; font-weight: 700; color: var(--accent-2); margin: 12px 0 8px; }
 .ytd small { font-size: .75rem; color: var(--muted); font-weight: 400; white-space: nowrap; }
 .bar { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
@@ -102,7 +102,7 @@ body[data-state="ready"] .error-only { display: none; }
 /* Respect "reduce motion": slow the spinner, drop the other animations and transitions */
 @media (prefers-reduced-motion: reduce) {
   .spinner { animation-duration: 3s; }
-  .ready-only, dialog#help[open] { animation: none !important; }
+  .ready-only, dialog:is(#help, #embed)[open] { animation: none !important; }
   button, .gas-switch button, button.more span { transition: none !important; }
 }
 button {
@@ -115,8 +115,8 @@ button {
 .stats i { font-style: normal; }
 .basis { margin: 18px 0 0; color: var(--muted); font-size: .9rem; }
 .basis b { color: var(--text); font-family: var(--mono); font-weight: 600; }
-.spark-wrap { margin: 0 0 0 auto; flex: none; text-align: right; }
-.tag + .spark-wrap { margin-left: 8px; }
+.spark-wrap { margin-inline-start: auto; flex: none; text-align: end; }
+.tag + .spark-wrap { margin-inline-start: 8px; }
 .spark { display: block; width: 84px; height: 24px; }
 .spark polyline { fill: none; stroke: var(--accent-2); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
 .spark circle { fill: var(--accent-2); }
@@ -130,9 +130,9 @@ dl .wide { grid-column: 1 / -1; }
 .spark-wrap { cursor: pointer; border-radius: 6px; }
 .history { margin-top: 10px; }
 .history table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: .85rem; font-variant-numeric: tabular-nums; }
-.history caption { text-align: left; color: var(--muted); font-family: system-ui, sans-serif; font-size: .75rem; padding-bottom: 6px; }
-.history th { text-align: left; font-weight: 400; color: var(--muted); padding: 2px 0; }
-.history td { text-align: right; padding: 2px 0; }
+.history caption { text-align: start; color: var(--muted); font-family: system-ui, sans-serif; font-size: .75rem; padding-bottom: 6px; }
+.history th { text-align: start; font-weight: 400; color: var(--muted); padding: 2px 0; }
+.history td { text-align: end; padding: 2px 0; }
 .history td.up { color: var(--good); }
 .history td.down { color: var(--bad); }
 button.more {
@@ -176,17 +176,17 @@ button.more.open span { transform: rotate(180deg); }
 .help-btn:hover, .help-btn:focus-visible { border-color: var(--accent-2); outline: none; }
 .link-btn { margin: 0; padding: 0; background: none; color: var(--accent-2); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
-dialog#help {
+dialog:is(#help, #embed) {
   padding: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); color: var(--text);
   width: min(620px, calc(100% - 32px)); max-height: min(88vh, 900px); max-height: min(88dvh, 900px); overflow: hidden;
 }
-dialog#help[open] { display: flex; flex-direction: column; }
-dialog#help::backdrop { background: rgba(0,0,0,.65); backdrop-filter: blur(2px); }
-dialog#help[open] { animation: pop .22s ease-out; }
+dialog:is(#help, #embed)[open] { display: flex; flex-direction: column; }
+dialog:is(#help, #embed)::backdrop { background: rgba(0,0,0,.65); backdrop-filter: blur(2px); }
+dialog:is(#help, #embed)[open] { animation: pop .22s ease-out; }
 @keyframes pop { from { opacity: 0; transform: translateY(12px); } }
 .sheet-head {
   flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 14px 14px 12px 22px; border-bottom: 1px solid var(--line); background: var(--panel);
+  padding-block: 14px 12px; padding-inline: 22px 14px; border-bottom: 1px solid var(--line); background: var(--panel);
 }
 .sheet-head h2 { margin: 0; font-size: 1.25rem; line-height: 1.25; }
 .sheet { flex: 1 1 auto; min-height: 0; padding: 18px 22px 18px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
@@ -210,19 +210,19 @@ dialog#help[open] { animation: pop .22s ease-out; }
 .cmp-q small { color: var(--muted); font-weight: 400; }
 .cmp-row { display: grid; grid-template-columns: 64px 1fr 84px; align-items: center; gap: 8px; margin: 4px 0; font-size: .82rem; }
 .cmp-row span { color: var(--muted); }
-.cmp-row b { font-family: var(--mono); font-weight: 600; font-size: .8rem; text-align: right; }
+.cmp-row b { font-family: var(--mono); font-weight: 600; font-size: .8rem; text-align: end; }
 .cmp-bar { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; }
 .cmp-bar i { display: block; height: 100%; min-width: 4px; border-radius: 5px; }
 .cmp-note { font-size: .78rem; color: var(--muted) !important; margin: 10px 0 0 !important; }
 
 /* Bottom sheet on phones */
 @media (max-width: 640px) {
-  dialog#help {
+  dialog:is(#help, #embed) {
     width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 18px 18px 0 0; border-bottom: 0;
     max-height: 90vh; max-height: 90dvh;
   }
-  .sheet-head { padding: 12px 12px 10px 16px; }
-  dialog#help[open] { animation: slideup .25s ease-out; }
+  .sheet-head { padding-block: 12px 10px; padding-inline: 16px 12px; }
+  dialog:is(#help, #embed)[open] { animation: slideup .25s ease-out; }
   @keyframes slideup { from { transform: translateY(40px); opacity: .4; } }
   .sheet { padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
 }
@@ -241,13 +241,13 @@ dialog#help[open] { animation: pop .22s ease-out; }
 .goal-top b { font-size: 1.05rem; }
 .goal-num { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 1.15rem; font-weight: 700; color: var(--accent-2); }
 .goal-unit { color: var(--muted); }
-.goal-side { margin-left: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; }
+.goal-side { margin-inline-start: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; }
 .goal-bar { position: relative; height: 16px; background: var(--line); border-radius: 8px; }
 .goal-bar > i { display: block; height: 100%; max-width: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
-.goal-bar > span { position: absolute; top: -5px; bottom: -5px; width: 3px; margin-left: -1.5px; background: var(--text); border-radius: 2px; box-shadow: 0 0 8px rgba(255,255,255,.5); }
+.goal-bar > span { position: absolute; top: -5px; bottom: -5px; width: 3px; margin-inline-start: -1.5px; background: var(--text); border-radius: 2px; box-shadow: 0 0 8px rgba(255,255,255,.5); }
 .goal-note { margin: 6px 0 0; font-size: .88rem; color: var(--muted); }
 .goal-legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 8px; font-size: .8rem; color: var(--muted); }
-.goal-legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--accent); }
+.goal-legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-inline-end: 6px; vertical-align: -1px; background: var(--accent); }
 .goal-legend .sw.mark { width: 4px; background: var(--text); }
 .goal .src { color: var(--muted); font-size: .8rem; margin: 18px 0 0; }
 .verdict { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 3px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
@@ -296,7 +296,7 @@ dd.bad, .history td.bad, .bad-text { color: var(--bad); }
 .hero .since b { color: var(--text); font-family: var(--mono); }
 
 /* Fold-outs: "More", "What do these mean?" */
-details.more-info { margin-top: 14px; text-align: left; }
+details.more-info { margin-top: 14px; text-align: start; }
 details.more-info > summary {
   display: inline-flex; align-items: center; gap: 6px; cursor: pointer; list-style: none;
   color: var(--accent-2); font-weight: 600; font-size: .9rem; padding: 6px 12px;
@@ -315,7 +315,7 @@ details.more-info[open] > summary { margin-bottom: 12px; }
 .standing > h2 { margin: 0 0 12px; }
 .status-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 .status-card {
-  padding: 18px; background: var(--panel); border: 1px solid var(--line); border-left: 6px solid var(--tone); border-radius: 14px;
+  padding: 18px; background: var(--panel); border: 1px solid var(--line); border-inline-start: 6px solid var(--tone); border-radius: 14px;
 }
 .sc-label { margin: 0; color: var(--muted); font-size: .85rem; }
 .sc-title { margin: 6px 0 10px; font-size: 1.35rem; font-weight: 700; color: var(--text); line-height: 1.2; }
@@ -327,15 +327,15 @@ details.more-info[open] > summary { margin-bottom: 12px; }
 .standing details.more-info > p { color: #c6d1cd; }
 
 /* 4. Country cards: badge + one number, the rest behind "More" */
-.badge { margin-left: auto; font-size: .78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+.badge { margin-inline-start: auto; font-size: .78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap;
   color: var(--tone); background: color-mix(in srgb, var(--tone) 14%, transparent); border: 1px solid color-mix(in srgb, var(--tone) 45%, transparent); }
 .badge.ok { --tone: var(--ok); } .badge.warn { --tone: var(--warn); } .badge.bad { --tone: var(--bad); }
-.card .tag + .badge { margin-left: 8px; }
+.card .tag + .badge { margin-inline-start: 8px; }
 .legend { margin: -4px 0 14px; color: var(--muted); font-size: .88rem; }
 .legend .badge { margin: 0 4px 0 0; }
 .share { margin: 8px 0 0; color: var(--muted); font-size: .88rem; }
 .card details.more-info { margin-top: 12px; }
-.card details.more-info .spark-wrap { margin: 0 0 6px; text-align: left; }
+.card details.more-info .spark-wrap { margin: 0 0 6px; text-align: start; }
 
 /* 5. "How we calculate this" folds away */
 details.method > summary { cursor: pointer; list-style: none; }
@@ -353,7 +353,7 @@ details.method[open] > summary { margin-bottom: 12px; }
  * Markup: <body class="has-scene"> with <canvas class="scene" aria-hidden="true"></canvas> as its first child.
  * The header grows into a "stage" where the picture shows; the horizon is the header's bottom edge, and below it
  * the picture fades into the page. Text on top of it gets a dark backing so it stays easy to read. */
-.has-scene { --stage-h: clamp(290px, 16vw + 200px, 420px); }
+.has-scene { --stage-h: clamp(330px, 16vw + 200px, 420px); }   /* phones: room for the language row */
 .scene {
   position: absolute; top: 0; left: 0; z-index: -1; display: block; width: 100%; height: calc(var(--stage-h) + 360px);
   pointer-events: none;
@@ -373,3 +373,71 @@ details.method[open] > summary { margin-bottom: 12px; }
 }
 .has-scene .hero { background: rgba(20,26,24,.88); }
 @media (max-width: 640px) { .has-scene .top { padding-top: 18px; } }
+
+/* ---- Languages: the globe picker, right-to-left pages ---------------------------------------
+ * The page's inline script sets <html lang dir> before the first paint and, for a language other than English,
+ * data-i18n="pending" until translatePage() has run (so visitors never see the English flash by). */
+html[data-i18n="pending"] body { visibility: hidden; }
+.top { position: relative; }
+.lang-pick {
+  position: absolute; top: 14px; inset-inline-end: 16px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px;
+  border: 1px solid var(--line); border-radius: 999px; background: rgba(14,19,18,.72);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  color: var(--text); font-size: .82rem; font-weight: 600; letter-spacing: .04em; cursor: pointer;
+}
+.lang-pick svg { width: 16px; height: 16px; opacity: .85; }
+/* The real <select> covers the pill, invisible: tapping opens the device's own list */
+.lang-pick select { position: absolute; inset: 0; width: 100%; margin: 0; opacity: 0; cursor: pointer; font-size: 16px; }
+.lang-pick:hover { border-color: var(--accent-2); }
+.lang-pick:focus-within { border-color: var(--accent-2); outline: 2px solid var(--accent-2); outline-offset: 2px; }
+@media (max-width: 640px) { .lang-pick { position: static; order: -2; align-self: flex-end; margin: 0 0 8px; height: 32px; } }
+/* Right to left: elements that hold only a number keep left-to-right order; labels next to numbers (".ytd small",
+   "dd", ".goal-side"...) read right to left in the page font, since the code font has no Arabic letters. Signs stay
+   in front through signed(). */
+[dir="rtl"] .big, [dir="rtl"] .goal-num, [dir="rtl"] .ytd .num, [dir="rtl"] pre { direction: ltr; unicode-bidi: isolate; }
+[dir="rtl"] pre { text-align: left; }
+[dir="rtl"] .ytd small, [dir="rtl"] dd, [dir="rtl"] .goal-side, [dir="rtl"] .history td, [dir="rtl"] .spark-wrap figcaption {
+  font-family: system-ui, -apple-system, "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+}
+[dir="rtl"] body { font-family: system-ui, -apple-system, "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif; }
+
+/* ---- Embeds: "Put this clock on your website" and the widget (?embed=1 sets <html data-embed>) ---- */
+.embed-open {
+  display: inline-flex; align-items: center; gap: 8px; margin: 0 0 18px; padding: 10px 18px;
+  background: transparent; color: var(--accent-2); border: 1px solid var(--line); border-radius: 999px; font-size: .9rem;
+}
+.embed-open span { font-family: var(--mono); font-size: .85rem; }
+.embed-open:hover, .embed-open:focus-visible { border-color: var(--accent-2); outline: none; }
+.embed-code {
+  display: block; width: 100%; min-height: 96px; resize: vertical; padding: 10px 12px;
+  background: #0d1211; color: var(--text); border: 1px solid var(--line); border-radius: 10px;
+  font: .8rem/1.5 var(--mono); text-align: left;
+}
+.embed-copy { display: block; width: 100%; margin-top: 10px; padding: 11px; }
+.embed-label { margin: 18px 0 8px !important; color: var(--muted) !important; font-size: .85rem; }
+.embed-preview { display: block; width: 100%; max-width: 480px; height: 300px; margin: 0 auto; border: 0; border-radius: 16px; background: var(--bg); }
+
+/* The widget: the scene strip with the clock's name, the coloured answer and the live number, nothing else */
+html[data-embed], html[data-embed] body { overflow: hidden; }
+html[data-embed] body.has-scene { --stage-h: 64px; }
+html[data-embed] .scene { height: calc(var(--stage-h) + 140px); }
+html[data-embed] .top { min-height: var(--stage-h); padding: 12px 0 0; }
+html[data-embed] .top h1 { font-size: 1.05rem; letter-spacing: .01em; }
+html[data-embed] .wrap { padding: 0 10px; }
+html[data-embed] .top .sub, html[data-embed] .gas-bar, html[data-embed] .foot, html[data-embed] dialog,
+html[data-embed] main > :not(.answer):not(.hero), html[data-embed] .hero details, html[data-embed] .hero .since,
+html[data-embed] .answer-text { display: none !important; }
+html[data-embed] .answer {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin: 0 0 8px; padding: 10px 14px; border-top-width: 4px; border-radius: 14px;
+}
+html[data-embed] .answer-icon { font-size: 1.25rem; }
+html[data-embed] .answer-title { margin: 0; font-size: 1.12rem; }
+html[data-embed] .hero { margin: 0; padding: 12px 10px; border-radius: 14px; }
+html[data-embed] .hero .label { font-size: .85rem; }
+html[data-embed] .big { font-size: clamp(1.4rem, 8.5vw, 2.6rem); margin-top: 4px; }
+html[data-embed] .unit { margin: 2px 0 0; font-size: .82rem; }
+html[data-embed] .status { padding: 28px 12px; }
+.embed-credit { display: block; margin: 8px 0 10px; text-align: center; color: var(--muted); font-size: .8rem; text-decoration: none; }
+.embed-credit:hover { color: var(--accent-2); }
