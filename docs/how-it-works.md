@@ -28,9 +28,9 @@ img/                  icon.svg, og-image.png (link preview, 1200×630)
 ## How a page loads
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@v1.0.0/clock-core.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@7f64264169149b91d119f75504cf419cf42475c2/clock-core.css">
 <link rel="stylesheet" href="css/theme.css">
-<script type="importmap">{ "imports": { "clock-core": "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@v1.0.0/clock-core.js" } }</script>
+<script type="importmap">{ "imports": { "clock-core": "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@7f64264169149b91d119f75504cf419cf42475c2/clock-core.js" } }</script>
 <script type="module" src="js/app.js"></script>
 ```
 

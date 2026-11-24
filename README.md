@@ -18,9 +18,9 @@ release was tagged `V1.0.0` (capital V), so the clocks pin its commit,
 `7f64264169149b91d119f75504cf419cf42475c2`; later releases use lowercase tags such as `v1.1.0`:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@v1.0.0/clock-core.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@7f64264169149b91d119f75504cf419cf42475c2/clock-core.css">
 <script type="importmap">
-  { "imports": { "clock-core": "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@v1.0.0/clock-core.js" } }
+  { "imports": { "clock-core": "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@7f64264169149b91d119f75504cf419cf42475c2/clock-core.js" } }
 </script>
 <script type="module" src="js/app.js"></script>
 ```
