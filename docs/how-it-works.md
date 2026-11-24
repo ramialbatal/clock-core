@@ -125,8 +125,12 @@ so far  = annual × fraction of the year elapsed (UTC)
 
 ## Page layout: answer first, details on demand
 
-Every clock is written for a visitor who is not technical and reads quickly. Top to bottom:
+Every clock is written for a visitor who is not technical and reads quickly (think of a grandparent or a
+12-year-old opening it by chance). Top to bottom:
 
+0. **The scene** (`canvas.scene` behind `header.top`): an animated picture that shows the topic before a word is
+   read: smoke over chimneys for emissions, a sun, turbines and green hills for renewables, a town starting its working
+   day for jobs. See [Scenes](#scenes-the-picture-behind-the-header).
 1. **The answer** (`section.answer`, filled by `C.showAnswer`): an icon, a short title and one sentence, in a colour:
    green (good), amber (warning) or red (bad). For example 🔴 "We're heading the wrong way".
 2. **The live counter** (`section.hero`), with one human-scale line ("about 1,248 more every second").
@@ -139,6 +143,26 @@ Every clock is written for a visitor who is not technical and reads quickly. Top
 
 All visitor-facing wording lives in each clock's `js/messages.js`, as pure functions that turn numbers into a
 `Message` (tone, icon, title, text), with tests in `test/messages.test.js`. The page code only displays them.
+
+## Scenes: the picture behind the header
+
+Each clock draws its own picture in `js/scene.js`, a function returning a `Scene` (`layout` after each resize, `draw`
+for each frame). `app.js` starts it with
+`C.startScene(document.querySelector("canvas.scene"), myScene(), { groundAt: document.querySelector("header.top") })`.
+
+- **Markup:** `<body class="has-scene">` with `<canvas class="scene" aria-hidden="true">` as its first child. The CSS
+  makes the header a "stage" (`--stage-h`) and fades the picture into the page below it.
+- **The horizon** is the bottom of the header (`f.ground`). Put landmarks (chimneys, hills, buildings) just above it,
+  keep the top of the sky dark and plain for the title, and keep bright things (a sun) out of the middle column, where
+  the text is. Check at 375 px wide: the stage is shorter there.
+- **Cheap to draw:** build anything that depends on the size in `layout` (use `C.seeded` so it looks the same on every
+  visit), pre-render soft shapes once and stamp them with `drawImage`, keep particles to a few hundred. `startScene`
+  draws at 30 frames a second, caps pixel density at 2 and pauses off screen and in hidden tabs.
+- **Still frames:** with "reduce motion" the scene draws once, with `dt` 0. Things that move must already be in place
+  on that frame (warm up particles in `layout`), and a scene that follows the page's view (gas, source) should snap to
+  it when `dt` is 0. Call the returned `redraw()` after switching the view.
+- **Errors** are logged once and hide the canvas; the clock keeps working. The smoke test fails if the canvas did not
+  paint.
 
 ## Displaying numbers
 
@@ -153,7 +177,7 @@ All visitor-facing wording lives in each clock's `js/messages.js`, as pure funct
 | `npm run style` | No em or en dashes in any text file | every repository |
 | `npm run typecheck` | TypeScript checks the JSDoc types (`jsconfig.json`, strict) | every repository |
 | `npm test` | Unit tests for the pure functions | every repository |
-| `npm run smoke` | Serves the clock, opens it in Chromium at 1280 and 375 px, checks data loads, counters tick, verdicts show, no sideways scroll, no dashes, no console errors | clocks |
+| `npm run smoke` | Serves the clock, opens it in Chromium at 1280 and 375 px, checks data loads, counters tick, verdicts show, the header picture paints, no sideways scroll, no dashes, no console errors | clocks |
 
 `CLOCK_CORE_DIR=../clock-core npm run smoke` serves clock-core from a local checkout instead of the CDN, to test a
 clock-core change before releasing it. The weekly scheduled run catches data sources that changed or went away.

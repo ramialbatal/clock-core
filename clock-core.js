@@ -7,9 +7,9 @@
  *   import * as C from "https://cdn.jsdelivr.net/gh/ramialbatal/clock-core@<commit-or-tag>/clock-core.js";
  * (each clock maps the bare name "clock-core" to that URL with an import map).
  *
- * Sections: Time · Formatting · Data · Models · Rendering · Ticker · Page.
- * Pure functions (everything up to Rendering) also run in Node and are unit tested in test/clock-core.test.js.
- * The DOM helpers (Rendering, Ticker, Page) need a browser.
+ * Sections: Time · Formatting · Data · Models · Rendering · Ticker · Scene · Page.
+ * Pure functions (everything up to Rendering, plus `seeded`) also run in Node and are unit tested in
+ * test/clock-core.test.js. The DOM helpers (Rendering, Ticker, Scene, Page) need a browser.
  */
 
 /** @typedef {Record<number, number>} Series  Values by year, e.g. { 2024: 38.6e9, 2025: 39.0e9 }. */
@@ -519,6 +519,103 @@ export function setText(el, s, html = false) {
   if (!el || lastText.get(el) === s) return;
   lastText.set(el, s);
   if (html) el.innerHTML = s; else el.textContent = s;
+}
+
+// ---- Scene: an animated picture behind the top of the page ------------------------------
+
+/**
+ * A small seeded random number generator (mulberry32). Scenes use it so their layout (buildings, hills, cracks) is
+ * the same on every visit and changes only with the screen size.
+ * @param {number} seed
+ * @returns {() => number}  a function returning numbers in [0, 1)
+ */
+export function seeded(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(a ^ (a >>> 15), a | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * What a scene gets for each frame. Draw in CSS pixels: the context is already scaled for the screen.
+ * @typedef {object} SceneFrame
+ * @property {CanvasRenderingContext2D} ctx
+ * @property {number} w       width in CSS pixels
+ * @property {number} h       height in CSS pixels
+ * @property {number} ground  y of the horizon: the bottom edge of the `groundAt` element (the page header)
+ * @property {number} t       seconds since the scene started (a fixed moment when motion is reduced)
+ * @property {number} dt      seconds since the previous frame, at most 0.1 (0 after a resize or on a still frame)
+ */
+
+/**
+ * A scene: `layout` (optional) runs after every resize to build what depends on the size; `draw` paints one frame.
+ * @typedef {{ layout?: (f: SceneFrame) => void, draw: (f: SceneFrame) => void }} Scene
+ */
+
+/**
+ * Animate a scene on a canvas (CSS class "scene") behind the top of the page. It handles the screen's pixel density
+ * (capped at 2), resizing, pausing while the canvas is off screen or the tab is hidden, a single still frame for
+ * visitors who prefer reduced motion, and errors (logged once; the canvas hides and the page keeps working).
+ * @param {HTMLCanvasElement | null} canvas
+ * @param {Scene} scene
+ * @param {{ groundAt?: Element | null, fps?: number, stillAt?: number }} [opts]
+ *   groundAt: the element whose bottom edge is the horizon (default: half way down); fps: frames per second
+ *   (default 30); stillAt: the moment, in seconds, shown as the still frame (default 6)
+ * @returns {{ stop: () => void, redraw: () => void }}  redraw: repaint a paused or still scene now, e.g. after the
+ *   page's view changes (a running scene picks changes up on its next frame, so redraw does nothing then)
+ */
+export function startScene(canvas, scene, { groundAt = null, fps = 30, stillAt = 6 } = {}) {
+  const ctx = canvas?.getContext("2d");
+  if (!canvas || !ctx) return { stop: () => {}, redraw: () => {} };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+  /** @type {SceneFrame} */
+  const f = { ctx, w: 0, h: 0, ground: 0, t: stillAt, dt: 0 };
+  const t0 = performance.now() - stillAt * 1000;
+  let raf = 0, last = 0, dpr = 1, onScreen = true, stopped = false;
+
+  const stop = () => { stopped = true; cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); };
+  const paint = () => {
+    if (stopped || !f.w || !f.h) return;
+    try {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.save(); scene.draw(f); ctx.restore();
+    } catch (err) { console.error("Scene:", err); stop(); canvas.hidden = true; }
+  };
+  const resize = () => {
+    const box = canvas.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    f.w = box.width; f.h = box.height; f.dt = 0;
+    f.ground = groundAt ? Math.max(0, Math.min(f.h, groundAt.getBoundingClientRect().bottom - box.top)) : f.h / 2;
+    canvas.width = Math.round(f.w * dpr); canvas.height = Math.round(f.h * dpr);
+    if (reduce.matches) f.t = stillAt;
+    try { ctx.setTransform(dpr, 0, 0, dpr, 0, 0); scene.layout?.(f); } catch (err) { console.error("Scene:", err); stop(); canvas.hidden = true; return; }
+    paint();
+    run();
+  };
+  /** @param {number} ts */
+  const loop = (ts) => {
+    raf = 0;
+    if (stopped || reduce.matches || !onScreen || document.hidden) return;
+    raf = requestAnimationFrame(loop);
+    if (last && ts - last < 1000 / fps - 2) return;
+    f.dt = last ? Math.min((ts - last) / 1000, 0.1) : 0;
+    f.t = (ts - t0) / 1000;
+    last = ts;
+    paint();
+  };
+  const run = () => { if (!raf && !stopped) { last = 0; raf = requestAnimationFrame(loop); } };
+
+  const ro = new ResizeObserver(resize);
+  ro.observe(canvas);
+  if (groundAt) ro.observe(groundAt);
+  const io = new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; run(); });
+  io.observe(canvas);
+  document.addEventListener("visibilitychange", run);
+  reduce.addEventListener("change", () => { f.t = stillAt; f.dt = 0; paint(); run(); });
+  return { stop, redraw: () => { if (!raf) { f.dt = 0; paint(); } } };
 }
 
 // ---- Page chrome -------------------------------------------------------------------

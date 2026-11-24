@@ -46,6 +46,7 @@ The clock then sets its colours in its own `css/theme.css`: `--accent`, `--accen
 | Rendering | `sparkline`, `changeClass`, `trendText`, `wireHistory`, `sortInto`, `showVerdict` | Colours follow which direction is good, as displayed |
 | Messages | `message`, `TONE_ICON`, `showAnswer`, `statusCard`, `badge`, `wireShowAll` | The plain-language layout: answer banner, traffic-light cards, badges, short lists |
 | Ticker | `startTicker`, `stopTicker`, `setText` | About 10 redraws a second, writes only changed text, survives errors, reloads at New Year |
+| Scene | `startScene`, `seeded` | Runs the animated picture behind the header: sharp on any screen, pauses off screen, a still frame for "reduce motion" |
 | Page | `setState`, `wireHelp`, `fill`, `showVerdict` | Loading, ready and error states; the "?" pop-up; verdict badges |
 
 Every export has JSDoc types in [`clock-core.js`](clock-core.js); editors and agents get type hints and checks for free.

@@ -348,3 +348,28 @@ details.method[open] > summary { margin-bottom: 12px; }
 .show-all-row { text-align: center; margin: 16px 0 0; }
 .show-all { margin: 0; background: transparent; color: var(--accent-2); border: 1px solid var(--line); border-radius: 999px; padding: 10px 20px; }
 .show-all:hover, .show-all:focus-visible { border-color: var(--accent-2); outline: none; }
+
+/* ---- Scene: an animated picture behind the top of the page (startScene in clock-core.js) ----------------
+ * Markup: <body class="has-scene"> with <canvas class="scene" aria-hidden="true"></canvas> as its first child.
+ * The header grows into a "stage" where the picture shows; the horizon is the header's bottom edge, and below it
+ * the picture fades into the page. Text on top of it gets a dark backing so it stays easy to read. */
+.has-scene { --stage-h: clamp(290px, 16vw + 200px, 420px); }
+.scene {
+  position: absolute; top: 0; left: 0; z-index: -1; display: block; width: 100%; height: calc(var(--stage-h) + 360px);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(#000 calc(var(--stage-h) - 20px), transparent);
+  mask-image: linear-gradient(#000 calc(var(--stage-h) - 20px), transparent);
+}
+.has-scene .top { min-height: var(--stage-h); padding-top: 28px; }
+.has-scene .top h1 { text-shadow: 0 2px 18px rgba(0,0,0,.8), 0 1px 3px rgba(0,0,0,.9); }
+.has-scene .top .sub { color: #e2e9e6; text-shadow: 0 1px 12px rgba(0,0,0,.95), 0 1px 3px rgba(0,0,0,.95); }
+.has-scene .gas-switch, .has-scene .help-btn, .has-scene .hero, .has-scene .answer {
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.has-scene .gas-switch, .has-scene .help-btn { background: rgba(14,19,18,.78); }
+.has-scene .answer {
+  margin-top: 0; box-shadow: 0 10px 40px rgba(0,0,0,.45);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tone) 18%, rgba(14,19,18,.86)), rgba(14,19,18,.9));
+}
+.has-scene .hero { background: rgba(20,26,24,.88); }
+@media (max-width: 640px) { .has-scene .top { padding-top: 18px; } }
