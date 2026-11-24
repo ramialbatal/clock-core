@@ -1,0 +1,29 @@
+{
+  "name": "clock-core",
+  "version": "1.0.0",
+  "description": "Shared, dependency-free JavaScript and CSS for live data clocks.",
+  "type": "module",
+  "main": "clock-core.js",
+  "license": "MIT",
+  "author": "Rami Albatal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ramialbatal/clock-core.git"
+  },
+  "scripts": {
+    "test": "node --test 'test/**/*.test.js'",
+    "typecheck": "tsc -p jsconfig.json",
+    "style": "node scripts/check-style.js",
+    "check": "npm run style && npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "typescript": "5.6.3"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "clock-core.js",
+    "clock-core.css"
+  ]
+}
