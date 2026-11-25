@@ -4,7 +4,15 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
-## v1.8.2 (2026-11)
+## v1.8.3 (2026-11)
+
+- "Try again" now reloads the whole page, and a page showing the error reloads by itself when the device comes back
+  online or the visitor returns to the tab. A phone woken from sleep could show the error and stay stuck on it,
+  because retrying inside the stale page kept failing; only pulling down to refresh worked.
+- `fetchText` checks with the source every time (`cache: "no-cache"`), so a bad copy kept by the browser can't keep a
+  page broken. Clocks no longer wire #retry themselves: `setState("error")` does it.
+
+## v1.8.2 (2026-11), commit `84e352e`
 
 - Small, short phones (iPhone SE size): an even shorter stage and the answer's title only; the big counter shrinks
   so 12-digit numbers stay on one line at 320 px.
