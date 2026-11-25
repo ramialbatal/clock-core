@@ -162,6 +162,18 @@ patterns worth remembering:
   its colour while all tests passed. Now a clock-core test checks that comments and braces in `clock-core.css`
   balance, and the smoke test fails if the answer banner has no colour stripe.
 
+## Speed and accessibility (checked November 2026)
+
+- **The picture, not the code, was the slow part.** Lighthouse on a phone blocked the page for 1.8 s on the Emissions
+  Clock. Drawing a frame took under 3 ms, but repainting a full-width canvas at 2x density, 30 times a second,
+  without fast graphics (as in Google's tests and on cheap phones) cost about 15 times more than at 1x. The picture
+  looks the same at 1x, so that is now the default. To find a cost like this, hide the canvas and measure again.
+- **Layout shift came from the loading state.** The short loading page showed the footer, which jumped away when the
+  clock appeared; and on phones the row of top buttons, added by the code, pushed the title down. Keep space for
+  anything the code adds, and measure with a `layout-shift` PerformanceObserver to see which element moved.
+- **Scrolling boxes need keyboard access:** a `<pre>` that scrolls sideways on phones needs `tabindex="0"` (axe:
+  scrollable-region-focusable). A border colour change is too faint as the only focus sign: use an outline.
+
 ## Releasing
 
 ### Tag names are case-sensitive

@@ -158,7 +158,8 @@ for each frame). `app.js` starts it with
   the text is. Check at 375 px wide: the stage is shorter there.
 - **Cheap to draw:** build anything that depends on the size in `layout` (use `C.seeded` so it looks the same on every
   visit), pre-render soft shapes once and stamp them with `drawImage`, keep particles to a few hundred. `startScene`
-  draws at 30 frames a second, caps pixel density at 2 and pauses off screen and in hidden tabs.
+  draws 30 frames a second at standard resolution (`maxDpr`, default 1: a sharp full-width canvas is the slowest
+  thing on a phone) and pauses off screen and in hidden tabs.
 - **Still frames:** with "reduce motion" the scene draws once, with `dt` 0. Things that move must already be in place
   on that frame (warm up particles in `layout`), and a scene that follows the page's view (gas, source) should snap to
   it when `dt` is 0. Call the returned `redraw()` after switching the view.

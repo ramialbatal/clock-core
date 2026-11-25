@@ -490,9 +490,10 @@ html[data-card] .embed-credit { margin-top: 10px; color: var(--text); opacity: .
   .answer-more { display: none; }
   .act-open { margin-top: 10px; padding: 5px 12px; font-size: .84rem; }
   .hero { padding: 18px 14px 16px; }
-  /* A clock without a switch: its "?" joins the top row, centred, instead of taking a row of its own */
+  /* A clock without a switch: its "?" joins the top row, next to the language button (centred, it hid behind a long
+     "Add to your site" in French or Arabic on small phones), instead of taking a row of its own */
   .top .wrap { position: relative; }
-  .gas-bar:not(:has(.gas-switch)) { position: absolute; top: 0; left: 50%; transform: translateX(-50%); margin: 0; }
+  .gas-bar:not(:has(.gas-switch)) { position: absolute; top: 0; inset-inline-end: 90px; margin: 0; }
   .gas-bar:not(:has(.gas-switch)) .help-btn { width: 32px; height: 32px; font-size: 1rem; }
   .hero .label { font-size: .92rem; }
   .unit { margin-bottom: 10px; }
@@ -508,3 +509,15 @@ html[data-card] .embed-credit { margin-top: 10px; color: var(--text); opacity: .
   .hero .label { font-size: .85rem; }
   .big { margin-top: 4px; }
 }
+
+/* ---- Steadier loading and clearer keyboard focus (v1.9.0) ---- */
+/* While the data loads, the page is short: the footer waits, so it doesn't jump away when the clock appears */
+body[data-state="loading"] .foot { display: none; }
+/* Phones: the row with the language and embed buttons is added by the code; keep its space from the start so the
+   title doesn't move down when it arrives */
+@media (max-width: 640px) {
+  html:not([data-embed]):not([data-card]) .top .wrap:not(:has(> .top-tools)) { padding-top: 40px; }
+}
+/* A clear ring around whatever the keyboard is on (a border colour change alone is too faint to see) */
+button.more:focus-visible, .help-btn:focus-visible, .embed-open:focus-visible, .act-open:focus-visible,
+.show-all:focus-visible, pre:focus-visible, summary:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
