@@ -321,7 +321,9 @@ export function parseCsv(text) {
 
 /** @param {string} url */
 export async function fetchText(url) {
-  const res = await fetch(url);
+  // "no-cache" checks with the source every time (cheap when nothing changed), so a bad copy kept by the browser,
+  // for example from a phone waking up offline, can never keep the page broken
+  const res = await fetch(url, { cache: "no-cache" });
   if (!res.ok) {
     let host = url;
     try { host = new URL(res.url || url, globalThis.location?.href).hostname; } catch { /* keep the raw URL */ }
@@ -1045,7 +1047,8 @@ export function track(name) { if (statsUrl) hit({ p: name, t: name, e: "true" })
 // ---- Page chrome -------------------------------------------------------------------
 
 /**
- * Show "loading", "ready" or "error" content (CSS uses body[data-state]).
+ * Show "loading", "ready" or "error" content (CSS uses body[data-state]). On "error", the page recovers by reloading:
+ * see recoverFromError.
  * @param {"loading" | "ready" | "error"} state
  * @param {string} [msg]  Error text; an empty message shows a generic one.
  */
@@ -1053,6 +1056,25 @@ export function setState(state, msg) {
   document.body.dataset.state = state;
   const box = document.getElementById("error-msg");
   if (state === "error" && box) box.textContent = msg || t("core.error");
+  if (state === "error") recoverFromError();
+}
+
+let recovering = false;
+/**
+ * After an error, "Try again" (#retry) reloads the whole page, like pulling down to refresh: a fresh start always
+ * works once the connection is back, where retrying inside a page woken from sleep may not. The page also reloads by
+ * itself when the device comes back online or the visitor returns to the tab while the error is showing.
+ */
+function recoverFromError() {
+  const retry = document.getElementById("retry");
+  if (retry) retry.onclick = () => location.reload();
+  if (recovering) return;
+  recovering = true;
+  const again = () => {
+    if (document.body.dataset.state === "error" && !document.hidden && navigator.onLine !== false) location.reload();
+  };
+  window.addEventListener("online", again);
+  document.addEventListener("visibilitychange", again);
 }
 
 /** Wire the "?" explainer dialog (#help) to its open and close buttons. */

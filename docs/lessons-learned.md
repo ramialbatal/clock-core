@@ -123,6 +123,12 @@ numbers were wrong or a country was missing. Check this list before adding a dat
 - Arabic numbers: the browser's default Arabic format uses Eastern Arabic digits, which made counters jump in width.
   The Arabic locale is `ar-u-nu-latn` (Western digits), and a leading + or - is kept in front with isolation marks.
 
+### A dead "Try again" on phones
+- A clock left open on a phone, then woken, showed the error box, and "Try again" failed every time; only pulling
+  down to refresh helped. Retrying inside a page restored from sleep can keep failing (a stale connection, or a bad
+  copy in the browser's cache). Now "Try again" reloads the page, the page reloads itself when the device comes back
+  online or the tab is shown again, and data requests always check with the source (`cache: "no-cache"`).
+
 ### Year rollover
 - `YEAR` is read once at page load. A tab open across New Year kept counting the old year. The ticker now reloads the
   page when the year changes.
