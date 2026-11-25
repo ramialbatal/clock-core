@@ -31,7 +31,8 @@ the rule here first rather than quietly breaking it in one clock.
    which verdicts must show), and the texts.
 4. Turn on GitHub Pages (Settings, Pages, "Deploy from a branch", `main`, `/ (root)`).
    Before you do, check that the clock-core URLs in `index.html` return 200: Pages takes over the address immediately.
-5. Link it from the other clocks' footers, the personal site and the GitHub profile.
+5. Link it from the other clocks' footers, the personal site and the GitHub profile, and add it to "The world right now"
+   (`clocks/index.html` in the website repository: its address and its name in all four languages).
 6. Make it findable: add `sitemap.xml`, `llms.txt` and the `google-site-verification` meta tag (copy them from another
    clock), add the new sitemap to `robots.txt` in the website repository, then submit it in Google Search Console
    (property `https://ramialbatal.github.io/`) and request indexing for the new address.
@@ -118,3 +119,4 @@ the rule here first rather than quietly breaking it in one clock.
 - [ ] Link preview image (`img/og-image.png`, 1200×630) regenerated if the header changed, and checked by eye for dashes.
 - [ ] README (data, method, goal, licences) and these notes updated if anything changed.
 - [ ] New clocks: sitemap, `llms.txt`, verification tag, sitemap listed in the website's `robots.txt` and submitted.
+- [ ] New clocks: listed on the website's `clocks/` page, and the widget fits its 300 px frame (`npm run smoke`).
