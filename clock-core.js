@@ -734,17 +734,19 @@ export function seeded(seed) {
 
 /**
  * Animate a scene on a canvas (CSS class "scene") behind the top of the page. It handles the screen's pixel density
- * (capped at 2), resizing, pausing while the canvas is off screen or the tab is hidden, a single still frame for
+ * (capped at `maxDpr`), resizing, pausing while the canvas is off screen or the tab is hidden, a single still frame for
  * visitors who prefer reduced motion, and errors (logged once; the canvas hides and the page keeps working).
  * @param {HTMLCanvasElement | null} canvas
  * @param {Scene} scene
- * @param {{ groundAt?: Element | null, fps?: number, stillAt?: number }} [opts]
+ * @param {{ groundAt?: Element | null, fps?: number, stillAt?: number, maxDpr?: number }} [opts]
  *   groundAt: the element whose bottom edge is the horizon (default: half way down); fps: frames per second
- *   (default 30); stillAt: the moment, in seconds, shown as the still frame (default 6)
+ *   (default 30); stillAt: the moment, in seconds, shown as the still frame (default 6); maxDpr: the most canvas
+ *   pixels per CSS pixel (default 1: a soft background looks the same, and redrawing a sharp full-width canvas 30 times
+ *   a second is the slowest thing on the page for phones without fast graphics, as in Google's speed tests)
  * @returns {{ stop: () => void, redraw: () => void }}  redraw: repaint a paused or still scene now, e.g. after the
  *   page's view changes (a running scene picks changes up on its next frame, so redraw does nothing then)
  */
-export function startScene(canvas, scene, { groundAt = null, fps = 30, stillAt = 6 } = {}) {
+export function startScene(canvas, scene, { groundAt = null, fps = 30, stillAt = 6, maxDpr = 1 } = {}) {
   const ctx = canvas?.getContext("2d");
   if (!canvas || !ctx) return { stop: () => {}, redraw: () => {} };
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
@@ -763,7 +765,7 @@ export function startScene(canvas, scene, { groundAt = null, fps = 30, stillAt =
   };
   const resize = () => {
     const box = canvas.getBoundingClientRect();
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
     f.w = box.width; f.h = box.height; f.dt = 0;
     f.ground = groundAt ? Math.max(0, Math.min(f.h, groundAt.getBoundingClientRect().bottom - box.top)) : f.h / 2;
     canvas.width = Math.round(f.w * dpr); canvas.height = Math.round(f.h * dpr);

@@ -4,7 +4,21 @@ Versions follow [semantic versioning](https://semver.org/): a clock written for 
 release; breaking changes get a new major version. Clocks pin an exact commit (or a release tag). Tags are lowercase from
 `v1.1.0` on.
 
-## v1.8.3 (2026-11)
+## v1.9.0 (2026-11)
+
+From an accessibility and speed check of all five clocks (axe, Lighthouse, keyboard):
+
+- Faster on phones: `startScene` draws the picture at standard resolution by default (new option `maxDpr`, default 1;
+  it was capped at 2). The picture looks the same, and the time the page is blocked on a slow phone drops about
+  15 times (about 3.8 s to 0.26 s in an 8 second test on the Emissions Clock).
+- Steadier loading: the footer waits until the clock has loaded, and on phones the space for the language
+  and embed buttons is kept from the start, so nothing jumps when the clock appears (layout shift was 0.25 to 0.33).
+- Keyboard: a clear ring around the focused button, summary or formula box (some buttons only changed border colour).
+  Clocks should give their scrolling formula box `tabindex="0"`, so keyboard users can scroll it.
+- Phones: on a clock without a switch, the "?" now sits next to the language button. Centred, it was hidden behind a
+  long "Add to your site" button (French, Arabic) on small phones.
+
+## v1.8.3 (2026-11), commit `dfec615`
 
 - "Try again" now reloads the whole page, and a page showing the error reloads by itself when the device comes back
   online or the visitor returns to the tab. A phone woken from sleep could show the error and stay stuck on it,
