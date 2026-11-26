@@ -35,6 +35,8 @@ the rule here first rather than quietly breaking it in one clock.
 6. Make it findable: add `sitemap.xml`, `llms.txt` and the `google-site-verification` meta tag (copy them from another
    clock), add the new sitemap to `robots.txt` in the website repository, then submit it in Google Search Console
    (property `https://ramialbatal.github.io/`) and request indexing for the new address.
+   Keep `og:site_name` as "AI for things that matter": Google shows one site name for all of ramialbatal.github.io,
+   taken from the homepage, and mixed names make it guess.
 7. Describe each dataset in the page's structured data (`isBasedOn`) with a `description` and a `license` (the
    licence's URL, or the provider's terms page when it has no open licence, as for SIPRI and IRENA); Google Search
    Console flags datasets without either.
